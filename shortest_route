@@ -1,5 +1,39 @@
 #include <stdio.h>
 
 int main(){
-
+    int i;
+    int row = 2, col = 0;     //temporary initialization
+    /* 
+        MINI MAP (TENTATIVE FORMAT)
+      - array sizes should be constant, unless you guys want to include dynamic memory allocation
+      - find random number generator to fill array 
+            [IDEAS FOR RANDOM NUMBER GENERATING]
+            - can set it as it will only fill certain parts of the array, in others words, fixed minimap with RNG values
+      - those with 0 values will be ignored, excluding the starting point, so users can only travel to areas with values > 0
+    */
+    int minimap[5][7] = { { 0, 0, 6, 5, 2, 0, 0 }
+                          { 0, 4, 0, 0, 0, 1, 0 }
+                          { 0, 0, 0, 0, 0, 0, 3 }       // test case will set 3rd row, 1st col as starting point ( (2,0) in index form )
+                          { 0, 6, 0, 0, 0, 4, 0 }
+                          { 0, 0, 7, 2, 1, 0, 0 } };
+                          
+                          
+   /*
+        PLAYER MOVEMENT
+         - per turn, user gets prompted to enter location in form of letter e.g. A,B,C, letters have corresponding index values
+         of mini-map 
+         - after user enters letter, store in index
+   */
+   int player1[5][7] = { { 0, 0, 0, 0, 0, 0, 0 }
+                          { 0, 0, 0, 0, 0, 0, 0 }
+                          { 0, 0, 0, 0, 0, 0, 0 }       
+                          { 0, 0, 0, 0, 0, 0, 0 }
+                          { 0, 0, 0, 0, 0, 0, 0 } };
+                          
+   int player2[5][7] = {  { 0, 0, 0, 0, 0, 0, 0 }
+                          { 0, 0, 0, 0, 0, 0, 0 }
+                          { 0, 0, 0, 0, 0, 0, 0 }       
+                          { 0, 0, 0, 0, 0, 0, 0 }
+                          { 0, 0, 0, 0, 0, 0, 0 } };
+                        
 }
