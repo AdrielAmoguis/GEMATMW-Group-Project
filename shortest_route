@@ -1,5 +1,19 @@
 #include <stdio.h>
 
+//Ben
+void displayMap1(){
+    printf("\t     %d == %d == %d == %d == %d\n", minimap1[0][2], minimap1[0][3], minimap1[0][4], minimap1[0][5], minimap1[0][6]);
+	printf("\t    /        /   \\        \\\n");
+	printf("\t   %d        /     \\        %d\n", minimap1[1][1], minimap1[1][5]);
+	printf("\t  /        /       \\        \\\n");
+	printf("\t %d ------ %d ------- %d ------ %d\n", minimap1[2][0], minimap1[2][2], minimap1[2][4], minimap1[2][6]);
+	printf("\t  \\        \\       /        /\n");
+	printf("\t   %d        \\     /        %d\n", minimap1[3][1], minimap1[3][5]);
+	printf("\t    \\        \\   /        /\n");
+	printf("\t     %d == %d == %d == %d == %d\n", minimap1[4][2], minimap1[4][3], minimap1[4][4], minimap1[4][5], minimap1[4][6]);
+}
+
+
 int main(){
     int i;
     int row = 2, col = 0;     //temporary initialization
