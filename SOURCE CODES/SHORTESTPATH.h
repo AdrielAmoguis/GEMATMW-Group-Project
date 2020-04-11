@@ -24,7 +24,7 @@
 	#define OS_PAUSE() system("PAUSE")
 #else
 	#define OS_CLEAR() system("clear")
-	#define OS_PAUSE() read -n1 -r -p "Press any key to continue..." key
+	#define OS_PAUSE() system("read -n1 -r -p "Press any key to continue..." key")
 #endif
 
 // Macro Definitions
