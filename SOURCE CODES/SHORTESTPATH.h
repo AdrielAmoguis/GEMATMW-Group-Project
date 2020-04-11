@@ -2,13 +2,13 @@
 	GEMATMW PROJECT
 	SHORTEST PATH MODULE
 	
-	DEVELOPMENT NOTES:
+	DEVELOPMENT NOTES [Last updated: 10:35 PM - 04/11/2020]:
 		- Node structure systems have been implemented.
 		- Path structure systems have been implemented.
-		- Random distance generation ongoing development:
-			- Horizontal system complete
-			- Vertical system ongoing
-			- Diagonal system yet to be started
+		- Random distance generation has been implemented.
+		- Gameplay system under implementation.
+		- DisplayGrid under implementation [KYLE].
+		- Dijkstra's algorithm to be implemented.
 */
 
 // Library Imports
@@ -181,7 +181,7 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	// Initialize the pathList
 	initShortestPathPaths(pathList);
 	// Variable Declarations
-	int i, j, k, h;
+	int i, j, k;
 	int index;
 	
 	// Initialize horizontal first element
@@ -235,7 +235,58 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 		}
 	}
 	
-	// UNFINISHED -> DIAGONAL PATHS
+	index++;
+	// Initialize Falling-Diagonal first element
+	pathList[index].distance = getRandInt(min, max);
+	pathList[index].node1 = 0;
+	pathList[index].node2 = 8;
+	k = index;
+	
+	// Falling-Diagonal Paths
+	for(i=0; i<MAX_MUNICIPAL-1; i++) {
+		for(j=0; j<MAX_CITIES-1; j++) {
+			index = k + (i*(MAX_CITIES-1))+j;
+			if(index != k) {
+				if(j!=0) {
+					pathList[index].distance = getRandInt(min, max);
+					pathList[index].node1 = pathList[index-1].node1 + 1;
+					pathList[index].node2 = pathList[index-1].node2 + 1;
+				}
+				else {
+					pathList[index].distance = getRandInt(min, max);
+					pathList[index].node1 = i*7;
+					pathList[index].node2 = pathList[index].node1 + 8;
+				}
+			}
+		}
+	}
+	
+	index++;
+	// Initialize Rising-Diagonal first element
+	pathList[index].distance = getRandInt(min, max);
+	pathList[index].node1 = 1;
+	pathList[index].node2 = 7;
+	k = index;
+	
+	// Rising-Diagonal Paths
+	for(i=0; i<MAX_MUNICIPAL-1; i++) {
+		for(j=0; j<MAX_CITIES-1; j++) {
+			index = k + (i*(MAX_CITIES-1))+j;
+			if(index != k) {
+				if(j!=0) {
+					pathList[index].distance = getRandInt(min, max);
+					pathList[index].node1 = pathList[index-1].node1 + 1;
+					pathList[index].node2 = pathList[index-1].node2 + 1;
+				}
+				else {
+					pathList[index].distance = getRandInt(min, max);
+					pathList[index].node1 = (i*7)+1;
+					pathList[index].node2 = pathList[index].node1 + 6;
+				}
+			}
+		}
+	}
+	
 }
 
 /* This function displays the grid. 
@@ -249,8 +300,8 @@ int shortestPath() {
 	spNode SPNodes[MAX_MUNICIPAL][MAX_CITIES];
 	spPath SPPaths[MAX_PATH];
 	setShortestPathNodes(SPNodes);
+	setShortestPathPaths(SPPaths, 1, 999);
 	
-	setShortestPathPaths(SPPaths, 0, 200);
 	return 0;
 }
 
