@@ -7,3 +7,5 @@ Here are our source codes.
 4. Upload your changes to your forked repository.
 3. Create a pull request to the main repository.
 4. Tell your team leader to review your pull request.
+
+More about Pull Requests here: https://www.youtube.com/watch?v=_NrSWLQsDL4
