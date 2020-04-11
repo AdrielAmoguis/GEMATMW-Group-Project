@@ -46,11 +46,21 @@ typedef struct spNodeTag {
 	int nodeID;
 	char name[NODENAME_LEN];
 	char cityName[NODENAME_LEN];
+	int activePlayer;
 } spNode;
 
+typedef struct spMoveTag {
+	int oldNode;
+	int newNode;
+	int distance;
+	int totalDistance;
+} spMove;
 // User-Defined Functions
 
 // SECONDARY FUNCTIONS
+/* This function generates a random integer between min and max inclusive
+	and returns its value.
+*/
 int getRandInt(int min, int max) {
 	time_t t;
 	// Seed the rand()
@@ -71,6 +81,7 @@ void initShortestPathNodes(spNode nodes[][MAX_CITIES]) {
 			nodes[j][i].nodeID = i+j;
 			strcpy(nodes[j][i].name, "NULL");
 			strcpy(nodes[j][i].cityName, "NULL");
+			nodes[j][i].activePlayer = 0;
 		}
 	}
 }
@@ -295,12 +306,79 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	
 }
 
+/* This function checks if someone has won the game or not.
+	Returns 0 for false, 1 for player 1, 2 for player 2.
+*/
+int isGameOver(spMove *p1, spMove *p2, int destNode) {
+	
+	return 0;
+}
+
+/* This function implements playermoves.
+*/
+void doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], spMove *p1, spMove *p2) {
+	
+}
+
+/* This function is the heart of all the gameplay. It calls all relevant functions
+	and handles all the gameplay. 
+*/
+void spGameplay() {
+	// Declare applicable lists
+	int initialMovesetSize = 30;
+	spMove *p1 = malloc(sizeof(struct spMoveTag)*initialMovesetSize);
+	spMove *p2 = malloc(sizeof(struct spMoveTag)*initialMovesetSize);
+	
+	// Variable Declarations
+	int doExit = 0;
+	int turn = 1;
+	
+	// Main-loop
+	do {
+		
+	} while(!doExit);
+	
+	free(p1);
+	free(p2);
+}
+
 /* HEADER MAIN */
 int shortestPath() {
+	OS_CLEAR();
+	// Declare and initialize nodes & paths
 	spNode SPNodes[MAX_MUNICIPAL][MAX_CITIES];
 	spPath SPPaths[MAX_PATH];
 	setShortestPathNodes(SPNodes);
 	setShortestPathPaths(SPPaths, 1, 999);
+	
+	// Variable Declarations
+	char cChoice;
+	do {
+		// Display game rules & mechanics
+		OS_CLEAR();
+		printf("Note: Too see the entire map, please keep the terminal window in its biggest possible size.\n"
+			   "===========================================================================================\n"
+			   "\nGAME MECHANICS:\n"
+			   "\nThis game is about speed and smarts.\n"
+			   "1. Both players shall pick their starting points.\n"
+			   "\t- Starting points must be in the first city.\n"
+			   "2. Both players will have the same destination point.\n"
+			   "\t- Destination point must be in the last city, to be chosen by the players.\n"
+			   "3. Players cannot be on the same place at the same time.\n"
+			   "4. Whoever reaches the destination point with the least distance traveled wins the game.\n"
+			   "\n"
+			   "Note: Distances are randomized every game.\n"
+			   "Ready to play? [Y/n]: ");
+		scanf(" %c", &cChoice);
+	} while(cChoice!='Y' && cChoice!='y' && cChoice!='N' && cChoice!='n');
+	
+	if(cChoice=='N' || cChoice=='n')
+		return 0;
+	
+	printf("Once again, please set the window to the maximum size. If you haven't yet, do so now.\n");
+	OS_PAUSE();
+	
+	spGameplay();
 	
 	return 0;
 }
