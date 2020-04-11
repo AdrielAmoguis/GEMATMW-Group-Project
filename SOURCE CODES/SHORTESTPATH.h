@@ -214,21 +214,33 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	pathList[index].distance = getRandInt(min, max);
 	pathList[index].node1 = 0;
 	pathList[index].node2 = 7;
-	k = ++index;
+	k = index;
 	
 	// Vertical Paths
 	for(i=0; i<MAX_CITIES; i++) {
 		for(j=0; j<MAX_MUNICIPAL-1; j++) {
 			index = k + j+(i*(MAX_MUNICIPAL-1));
-			// UNFINISHED
-			printf("Path %d: Node1: %d, Node2: %d\n", index, pathList[index].node1, pathList[index].node2);
+			if(index != k) {
+				if(j!=0) {
+					pathList[index].distance = getRandInt(min, max);
+					pathList[index].node1 = pathList[index-1].node2;
+					pathList[index].node2 = pathList[index].node1 + 7;
+				}
+				else {
+					pathList[index].distance = getRandInt(min, max);
+					pathList[index].node1 = i;
+					pathList[index].node2 = pathList[index].node1 + 7;
+				}
+			}
 		}
 	}
+	
+	// UNFINISHED -> DIAGONAL PATHS
 }
 
 /* This function displays the grid. 
 */
-void displaySPGrid(spNode nodes[][MAX_CITIES]) {
+void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	
 }
 
@@ -237,7 +249,6 @@ int shortestPath() {
 	spNode SPNodes[MAX_MUNICIPAL][MAX_CITIES];
 	spPath SPPaths[MAX_PATH];
 	setShortestPathNodes(SPNodes);
-	displaySPGrid(SPNodes);
 	
 	setShortestPathPaths(SPPaths, 0, 200);
 	return 0;
