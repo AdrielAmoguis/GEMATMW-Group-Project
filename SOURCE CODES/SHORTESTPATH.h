@@ -7,14 +7,14 @@
 		- Path structure systems have been implemented.
 		- Random distance generation has been implemented.
 		- Gameplay system under implementation.
-		- DisplayGrid under implementation [KYLE].
+		- DisplayGrid under implementation.
+			- Think of a proper algorithm to do the final print.
 		- Dijkstra's algorithm to be implemented.
 */
 
 // Library Imports
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
 #include <string.h>
 #include <time.h>
 
@@ -24,7 +24,7 @@
 	#define OS_PAUSE() system("PAUSE")
 #else
 	#define OS_CLEAR() system("clear")
-	#define OS_PAUSE() system("read -n1 -r -p \"Press any key to continue...\" key")
+	#define OS_PAUSE() system("read -n1 -r -p "Press any key to continue..." key")
 #endif
 
 // Macro Definitions
@@ -61,10 +61,13 @@ typedef struct spMoveTag {
 /* This function generates a random integer between min and max inclusive
 	and returns its value.
 */
-int getRandInt(int min, int max) {
+int getRandInt(int seed, int min, int max) {
 	time_t t;
 	// Seed the rand()
-	srand((unsigned) time(&t));
+	if(seed==0)
+		srand((unsigned) time(&t));
+	else 
+		srand(seed);
 	int x = min;
 	x += rand() % (max-min);
 	return x;
@@ -74,14 +77,14 @@ int getRandInt(int min, int max) {
 /* This function initializes all values of the node array for shortest path.
 	This function is called by the setShortestPathNodes function. */
 void initShortestPathNodes(spNode nodes[][MAX_CITIES]) {
-	int i, j;
+	int i, j, id=0;
 	
-	for(i=0; i<MAX_CITIES; i++) {
-		for(j=0; j<MAX_MUNICIPAL; j++) {
-			nodes[j][i].nodeID = i+j;
-			strcpy(nodes[j][i].name, "NULL");
-			strcpy(nodes[j][i].cityName, "NULL");
-			nodes[j][i].activePlayer = 0;
+	for(i=0; i<MAX_MUNICIPAL; i++) {
+		for(j=0; j<MAX_CITIES; j++) {
+			nodes[i][j].nodeID = id++;
+			strcpy(nodes[i][j].name, "NULL");
+			strcpy(nodes[i][j].cityName, "NULL");
+			nodes[i][j].activePlayer = 0;
 		}
 	}
 }
@@ -196,7 +199,7 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	int index;
 	
 	// Initialize horizontal first element
-	pathList[0].distance = getRandInt(min, max);
+	pathList[0].distance = getRandInt(0, min, max);
 	pathList[0].node1 = 0;
 	pathList[0].node2 = 1;	
 	
@@ -207,12 +210,12 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 			index = (i*(MAX_CITIES-1))+j;
 			if(index != 0) {
 				if(j!=0) {
-					pathList[index].distance = getRandInt(min, max);
+					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 					pathList[index].node1 = pathList[index-1].node2;
 					pathList[index].node2 = pathList[index].node1 + 1;
 				}
 				else {
-					pathList[index].distance = getRandInt(min, max);
+					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 					pathList[index].node1 = pathList[index-1].node2 + 1;
 					pathList[index].node2 = pathList[index].node1 + 1;
 				}
@@ -222,7 +225,7 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	}
 	index++;
 	// Initialize Vertical first element
-	pathList[index].distance = getRandInt(min, max);
+	pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 	pathList[index].node1 = 0;
 	pathList[index].node2 = 7;
 	k = index;
@@ -233,12 +236,12 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 			index = k + j+(i*(MAX_MUNICIPAL-1));
 			if(index != k) {
 				if(j!=0) {
-					pathList[index].distance = getRandInt(min, max);
+					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 					pathList[index].node1 = pathList[index-1].node2;
 					pathList[index].node2 = pathList[index].node1 + 7;
 				}
 				else {
-					pathList[index].distance = getRandInt(min, max);
+					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 					pathList[index].node1 = i;
 					pathList[index].node2 = pathList[index].node1 + 7;
 				}
@@ -248,7 +251,7 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	
 	index++;
 	// Initialize Falling-Diagonal first element
-	pathList[index].distance = getRandInt(min, max);
+	pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 	pathList[index].node1 = 0;
 	pathList[index].node2 = 8;
 	k = index;
@@ -259,12 +262,12 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 			index = k + (i*(MAX_CITIES-1))+j;
 			if(index != k) {
 				if(j!=0) {
-					pathList[index].distance = getRandInt(min, max);
+					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 					pathList[index].node1 = pathList[index-1].node1 + 1;
 					pathList[index].node2 = pathList[index-1].node2 + 1;
 				}
 				else {
-					pathList[index].distance = getRandInt(min, max);
+					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 					pathList[index].node1 = i*7;
 					pathList[index].node2 = pathList[index].node1 + 8;
 				}
@@ -274,7 +277,7 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	
 	index++;
 	// Initialize Rising-Diagonal first element
-	pathList[index].distance = getRandInt(min, max);
+	pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 	pathList[index].node1 = 1;
 	pathList[index].node2 = 7;
 	k = index;
@@ -285,12 +288,12 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 			index = k + (i*(MAX_CITIES-1))+j;
 			if(index != k) {
 				if(j!=0) {
-					pathList[index].distance = getRandInt(min, max);
+					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 					pathList[index].node1 = pathList[index-1].node1 + 1;
 					pathList[index].node2 = pathList[index-1].node2 + 1;
 				}
 				else {
-					pathList[index].distance = getRandInt(min, max);
+					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
 					pathList[index].node1 = (i*7)+1;
 					pathList[index].node2 = pathList[index].node1 + 6;
 				}
@@ -303,7 +306,196 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 /* This function displays the grid. 
 */
 void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
+	// Temporary grid display
+	// Variable Declarations
+	int i, j, k;
+
+	// Declare & Initialize nodebox
+	struct nodeBoxTag {
+		char nodeBox[161];
+		spNode node;
+		int occupied;
+	} sNodeBox;
+	char nodeSample[161] =  "-------------------------------\n"
+					  		"|              ID             |\n"
+					  		"|                             |\n"
+					  		"|         OCCPUPIED: 0        |\n"
+					  		"-------------------------------\n";
+	strcpy(sNodeBox.nodeBox, nodeSample);
+	sNodeBox.occupied = 0;
+
+	// Create & initialize the displayNodes array
+	struct nodeBoxTag *current;
+	int nameStartIndex = 79;
+	struct nodeBoxTag displayNodes[MAX_MUNICIPAL][MAX_CITIES];
+	for(i=0;i<MAX_MUNICIPAL;i++) {
+		for(j=0;j<MAX_CITIES;j++) {
+			current = &displayNodes[i][j];
+			*current = sNodeBox;
+			current->node = nodeList[i][j];
+
+			// Fill in box information
+			// ID
+			if(current->node.nodeID<10) {
+				current->nodeBox[47] = '0';
+				current->nodeBox[48] = (current->node).nodeID + 48;
+			}
+			else {
+				current->nodeBox[47] = (((current->node).nodeID)/10) + 48;
+				current->nodeBox[48] = (((current->node).nodeID)%10) + 48;
+			}
+			// NAME (CENTER:79-80)
+				// Calculate ratio
+			nameStartIndex = 79;
+			nameStartIndex -= strlen(current->node.name)/2;
+			k = 0;
+			while(current->node.name[k]!=0) {
+				current->nodeBox[nameStartIndex + k] = current->node.name[k];
+				k++;
+			}
+
+			// Check if occupied (index:117)
+			current->nodeBox[117] = current->node.activePlayer + 48;
+		}
+	}
+
+	// Declare & Initialize PathLines
+	struct pathLineTag {
+		int pathID;
+		char pathBox[71];
+		spPath path;
+	} sPathBoxHor, sPathBoxVer, sPathBoxDiag;
+	char * pathSample1 = "             \0"
+					   "=============\0"
+					   "     000     \0"
+					   "=============\0"
+					   "             \0";
+	char * pathSample2 = "    |   |    \0"
+					   "    |   |    \0"
+					   "    |000|    \0"
+					   "    |   |    \0"
+					   "    |   |    \0";
+	char * pathSample3 = "## ##   ## ##\0"
+					   "  ## ### ##  \0"
+					   "000/## ##\\000\0"
+					   "  ## ### ##  \0"
+					   "## ##   ## ##\0";
+	strcpy(sPathBoxHor.pathBox, pathSample1);
+	strcpy(sPathBoxVer.pathBox, pathSample2);
+	strcpy(sPathBoxDiag.pathBox, pathSample3);
 	
+	struct pathLineTag *currPath;
+	spPath diag1, diag2;
+	struct pathLineTag displayPaths[MAX_PATH];
+	for(i=0;i<MAX_PATH-24;i++) {
+		currPath = &displayPaths[i];
+		if(i<30) {
+			// Horizontal
+			*currPath = sPathBoxHor;
+			currPath->path = pathList[i];
+			// Set distance (index: 34-36)
+			if(currPath->path.distance < 10) {
+				currPath->pathBox[33] = '0';
+				currPath->pathBox[34] = '0';
+				currPath->pathBox[35] = (currPath->path).distance + 48;
+			}
+			else if(currPath->path.distance < 100) {
+				currPath->pathBox[33] = '0';
+				currPath->pathBox[34] = ((currPath->path).distance / 10) + 48;
+				currPath->pathBox[35] = ((currPath->path).distance % 10) + 48;
+			}
+			else if(currPath->path.distance < 1000) {
+				currPath->pathBox[33] = ((currPath->path).distance / 100) + 48;
+				currPath->pathBox[34] = ((currPath->path).distance / 10 % 10) + 48;
+				currPath->pathBox[35] = ((currPath->path).distance % 10) + 48;
+			}
+		}
+		else if(i<58) {
+			// Vertical
+			*currPath = sPathBoxVer;
+			currPath->path = pathList[i];
+			// Set distance (index: 34-36)
+			if(currPath->path.distance < 10) {
+				currPath->pathBox[33] = '0';
+				currPath->pathBox[34] = '0';
+				currPath->pathBox[35] = (currPath->path).distance + 48;
+			}
+			else if(currPath->path.distance < 100) {
+				currPath->pathBox[33] = '0';
+				currPath->pathBox[34] = ((currPath->path).distance / 10) + 48;
+				currPath->pathBox[35] = ((currPath->path).distance % 10) + 48;
+			}
+			else if(currPath->path.distance < 1000) {
+				currPath->pathBox[33] = ((currPath->path).distance / 100) + 48;
+				currPath->pathBox[34] = ((currPath->path).distance / 10 % 10) + 48;
+				currPath->pathBox[35] = ((currPath->path).distance % 10) + 48;
+			}
+		}
+		else {
+			// Diagonals
+			*currPath = sPathBoxDiag;
+			diag1 = pathList[i];
+			diag2 = pathList[i+24];
+			// Set distance 1 (index: 28-30)
+			if(diag1.distance < 10) {
+				currPath->pathBox[28] = '0';
+				currPath->pathBox[29] = '0';
+				currPath->pathBox[30] = diag1.distance + 48;
+			}
+			else if(diag1.distance < 100) {
+				currPath->pathBox[28] = '0';
+				currPath->pathBox[29] = (diag1.distance / 10) + 48;
+				currPath->pathBox[30] = (diag1.distance % 10) + 48;
+			}
+			else if(diag1.distance < 1000) {
+				currPath->pathBox[28] = (diag1.distance / 100) + 48;
+				currPath->pathBox[29] = (diag1.distance / 10 % 10) + 48;
+				currPath->pathBox[30] = (diag1.distance % 10) + 48;
+			}
+			// Set distance 2 (index: 38-40)
+			if(diag2.distance < 10) {
+				currPath->pathBox[38] = '0';
+				currPath->pathBox[39] = '0';
+				currPath->pathBox[40] = diag2.distance + 48;
+			}
+			else if(diag2.distance < 100) {
+				currPath->pathBox[38] = '0';
+				currPath->pathBox[39] = (diag2.distance / 10) + 48;
+				currPath->pathBox[40] = (diag2.distance % 10) + 48;
+			}
+			else if(diag2.distance < 1000) {
+				currPath->pathBox[38] = (diag2.distance / 100) + 48;
+				currPath->pathBox[39] = (diag2.distance / 10 % 10) + 48;
+				currPath->pathBox[40] = (diag2.distance % 10) + 48;
+			}
+		}
+	}
+
+	// Print the actual grid
+	// Mega string array
+	char toPrint[3530] = "";
+	int nodeID[2];
+	printf("PLAYING FIELD:\n\n");
+	for(i=0;i<8;i++) {
+		for(j=0;j<12;j++) {
+			// Odd-Even system
+			if(i%2==0) {
+				// Even Row
+				if(j%2==0) {
+					// Even column - print node
+					// UNFINISED
+				}
+				else {
+					// Odd column
+				}
+			}
+			else {
+				// Odd Row
+			}
+		}
+	}
+	
+	OS_PAUSE();
 }
 
 /* This function checks if someone has won the game or not.
@@ -323,7 +515,7 @@ void doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], sp
 /* This function is the heart of all the gameplay. It calls all relevant functions
 	and handles all the gameplay. 
 */
-void spGameplay() {
+void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	// Declare applicable lists
 	int initialMovesetSize = 30;
 	spMove *p1 = malloc(sizeof(struct spMoveTag)*initialMovesetSize);
@@ -335,7 +527,8 @@ void spGameplay() {
 	
 	// Main-loop
 	do {
-		
+		// DISPLAY GRID
+		displaySPGrid(nodeList, pathList);
 	} while(!doExit);
 	
 	free(p1);
@@ -355,7 +548,7 @@ int shortestPath() {
 	char cChoice;
 	do {
 		// Display game rules & mechanics
-		OS_CLEAR();
+		//OS_CLEAR();
 		printf("Note: Too see the entire map, please keep the terminal window in its biggest possible size.\n"
 			   "===========================================================================================\n"
 			   "\nGAME MECHANICS:\n"
@@ -378,7 +571,7 @@ int shortestPath() {
 	printf("Once again, please set the window to the maximum size. If you haven't yet, do so now.\n");
 	OS_PAUSE();
 	
-	spGameplay();
+	spGameplay(SPNodes, SPPaths);
 	
 	return 0;
 }
