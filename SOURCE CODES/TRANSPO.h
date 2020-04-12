@@ -49,8 +49,23 @@ typedef struct detail{
 
 // Function Definitions
 // Secondary Functions
-
-
+/*
+  1. Generates 3 numbers that will add up to second parameter
+  2. Stores those 3 numbers to first parameter
+*/
+void generateThree(int stocks[3], int sum_stocks){
+	int i, nStock, min = MIN_SEED, max = MAX_SEED, sum = 0;
+	
+	for (i=0; i<3; i++){
+		if (i != 2){
+			nStock = rand() % (max - min + 1) + min;
+			sum += nStock;
+		}
+		else
+			nStock = (sum_stocks - sum);
+		stocks[i] = nStock;
+	}
+}
 
 // Primary Functions
 // ==================== START OF RNG FUNCTIONS =======================
@@ -72,23 +87,7 @@ void generatePrice(Detail details[3][3])
 		}
 	}
 }
-/*
-  1. Generates 3 numbers that will add up to second parameter
-  2. Stores those 3 numbers to first parameter
-*/
-void generateThree(int stocks[3], int sum_stocks){
-	int i, nStock, min = MIN_SEED, max = MAX_SEED, sum = 0;
-	
-	for (i=0; i<3; i++){
-		if (i != 2){
-			nStock = rand() % (max - min + 1) + min;
-			sum += nStock;
-		}
-		else
-			nStock = (sum_stocks - sum);
-		stocks[i] = nStock;
-	}
-}
+
 /*
 	1. Generate a number
 	2. Generate 3 numbers that will add up to that number
