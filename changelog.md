@@ -6,3 +6,4 @@ Please write all changes here. Follow the format.
 - [Adi - 03/24/2020] Revised the Minimap Kyle made into a structured format, initialized and displayed by different functions. [See commit description].
 - [Adi - 04/11/2020] Revised to a modular development scheme. Developed the shortest path structure system and random distance generator.
 - [Adi - 04/11/2020] Completed shortest path random distance generator.
+- [Adi - 04/13/2020] Completed the displayGrid function in Shortest Path.
