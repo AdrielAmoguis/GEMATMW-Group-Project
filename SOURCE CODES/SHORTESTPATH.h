@@ -7,8 +7,7 @@
 		- Path structure systems have been implemented.
 		- Random distance generation has been implemented.
 		- Gameplay system under implementation.
-		- DisplayGrid under implementation.
-			- Think of a proper algorithm to do the final print.
+		- DisplayGrid has been implemented.
 		- Dijkstra's algorithm to be implemented.
 */
 
