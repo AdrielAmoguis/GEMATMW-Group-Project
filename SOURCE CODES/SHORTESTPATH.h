@@ -373,12 +373,12 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 		char pathBox[71];
 		spPath path;
 	} sPathBoxHor, sPathBoxVer, sPathBoxDiag;
-	const char * pathSample1 = "             \0"
+	const char * pathSample2 = "             \0"
 					   "=============\0"
 					   "     000     \0"
 					   "=============\0"
 					   "             \0";
-	const char * pathSample2 = "    |   |    \0"
+	const char * pathSample1 = "    |   |    \0"
 					   "    |   |    \0"
 					   "    |000|    \0"
 					   "    |   |    \0"
@@ -496,55 +496,70 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 
 	// Print the actual grid
 	/*
-		ALGORITHM:
-		
+		The grid axes will be inverted.
+		Prepare for spaghetti code
 	*/
-	// Row-Wise Array
-	char megaString[10000] = "";
-	int nodeI = 0, nodeJ = 0;
-	int pathI;
+
+	// Variable Declarations
+	char finalDisplay[20000] = "";
+	int nodeI = 4;
+	int nodeJ = 0;
+	int pathI = 33, pathI2 = 24, pathI3 = 76;
 	int nodeK = 0, pathK = 0;
-	// Main Row Loop
-	for(i=0;i<9;i++) {
-		printf("Row Loop\n");
+	// Row-Loop
+	for(i=0;i<13;i++) {
 		// Line-index loop
-		for(j=0;j<5;j++) {
-			printf("Line-index loop\n");
-			printf("nodeK = %d; pathK = %d\n", nodeK, pathK);
-			// Column Loop
-			for(k=0;k<13;k++) {
-				printf("Column loop\n");
-				// Odd-Even system
-				if(k%2==0) {
-					// Even - print node
-					printf("TEST OUTPUT %d %d NODE: %s\n", nodeI, nodeJ, &displayNodes[nodeI][nodeJ].nodeBox[nodeK]);
-					strcat(megaString, &displayNodes[nodeI][nodeJ++].nodeBox[nodeK]);
-					printf("After node cat\n");
+		nodeK = 0;
+		pathK = 0;
+		for(k=0;k<5;k++) {
+			// Odd-Even system
+			if(i%2==0) {
+				// Nodes & Paths Row
+				// Column Loop
+				pathI = 33 + 2*i;
+				for(j=0;j<9;j++) {
+					// Odd-Even System
+					if(j%2==0) {
+						// Even - print node
+						strcat(finalDisplay, &displayNodes[nodeI--][nodeJ].nodeBox[nodeK]);
+					}
+					else {
+						// Odd - print path
+						strcat(finalDisplay, &displayPaths[pathI--].pathBox[pathK]);
+					}
 				}
-				else {
-					// Odd - print path
-					printf("TEST OUTPUT %d PATH: %s\n", pathI,&displayPaths[pathI].pathBox[pathK]);
-					strcat(megaString, &displayPaths[pathI++].pathBox[pathK]);
-					printf("After path cat\n");
+			}
+			else {
+				// Paths Only
+				// Odd-Even system, even hor, odd diag
+				// Column Loop
+				pathI2 = 24 + i/2;
+				pathI3 = 76 + i/2;
+				for(j=0;j<9;j++) {
+					strcat(finalDisplay, "         ");
+					if(j%2==0) {
+						// Even - print horizontal
+						strcat(finalDisplay, &displayPaths[pathI2].pathBox[pathK]);
+						pathI2 -= 6;
+					}
+					else {
+						// Odd - print diagonal
+						strcat(finalDisplay, &displayPaths[pathI3].pathBox[pathK]);
+						pathI3 -= 6;
+					}
 				}
 			}
 			nodeK += 32;
 			pathK += 14;
-			nodeJ = 0;
-			pathI = i*6;
-			strcat(megaString, "\n");
+			nodeI = 4; 
+			strcat(finalDisplay, "\n");
 		}
-		pathI = i*6;
-		nodeK = 0;
-		pathK = 0;
-		nodeI++;
-		nodeJ = 0;
-		strcat(megaString, "\n");
-		printf("Concat newline\n");
-		printf("%s", megaString);
-		OS_PAUSE();
+		if(i%2==0)
+			nodeJ++;
 	}
-	//printf("%s", megaString);
+
+	// Finally, print the finished grid
+	printf("%s\n", finalDisplay);	
 	
 	OS_PAUSE();
 }
