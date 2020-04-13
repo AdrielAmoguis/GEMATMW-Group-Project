@@ -306,7 +306,6 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 /* This function displays the grid. 
 */
 void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
-	// Temporary grid display
 	// Variable Declarations
 	int i, j, k;
 
@@ -316,14 +315,23 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 		spNode node;
 		int occupied;
 	} sNodeBox;
-	char nodeSample[161] =  "-------------------------------\n"
-					  		"|              ID             |\n"
-					  		"|                             |\n"
-					  		"|         OCCPUPIED: 0        |\n"
-					  		"-------------------------------\n";
-	strcpy(sNodeBox.nodeBox, nodeSample);
+	char nodeSample[161] =  "-------------------------------\0"
+					  		"|              ID             |\0"
+					  		"|                             |\0"
+					  		"|         OCCPUPIED: 0        |\0"
+					  		"-------------------------------\0";
+	strcpy(sNodeBox.nodeBox, "");
+	i = 0;
+	for(j=0;j<5;j++) {
+		while(nodeSample[i]!=0) {
+			sNodeBox.nodeBox[i] = nodeSample[i];
+			i++;
+		}
+		sNodeBox.nodeBox[i] = 0;
+		i++;
+	}
 	sNodeBox.occupied = 0;
-
+	
 	// Create & initialize the displayNodes array
 	struct nodeBoxTag *current;
 	int nameStartIndex = 79;
@@ -365,24 +373,39 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 		char pathBox[71];
 		spPath path;
 	} sPathBoxHor, sPathBoxVer, sPathBoxDiag;
-	char * pathSample1 = "             \0"
+	const char * pathSample1 = "             \0"
 					   "=============\0"
 					   "     000     \0"
 					   "=============\0"
 					   "             \0";
-	char * pathSample2 = "    |   |    \0"
+	const char * pathSample2 = "    |   |    \0"
 					   "    |   |    \0"
 					   "    |000|    \0"
 					   "    |   |    \0"
 					   "    |   |    \0";
-	char * pathSample3 = "## ##   ## ##\0"
+	const char * pathSample3 = "## ##   ## ##\0"
 					   "  ## ### ##  \0"
 					   "000/## ##\\000\0"
 					   "  ## ### ##  \0"
 					   "## ##   ## ##\0";
-	strcpy(sPathBoxHor.pathBox, pathSample1);
-	strcpy(sPathBoxVer.pathBox, pathSample2);
-	strcpy(sPathBoxDiag.pathBox, pathSample3);
+	
+	strcpy(sPathBoxHor.pathBox, "");
+	strcpy(sPathBoxVer.pathBox, "");
+	strcpy(sPathBoxDiag.pathBox, "");
+	i = 0;
+	for(j=0;j<5;j++) {
+		while(pathSample1[i]!=0) {
+			sPathBoxHor.pathBox[i] = pathSample1[i];
+			sPathBoxVer.pathBox[i] = pathSample2[i];
+			sPathBoxDiag.pathBox[i] = pathSample3[i];
+			i++;
+		}
+		sPathBoxHor.pathBox[i] = 0;
+		sPathBoxVer.pathBox[i] = 0;
+		sPathBoxDiag.pathBox[i] = 0;
+		i++;
+	}
+	
 	
 	struct pathLineTag *currPath;
 	spPath diag1, diag2;
@@ -472,28 +495,56 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	}
 
 	// Print the actual grid
-	// Mega string array
-	char toPrint[3530] = "";
-	int nodeID[2];
-	printf("PLAYING FIELD:\n\n");
-	for(i=0;i<8;i++) {
-		for(j=0;j<12;j++) {
-			// Odd-Even system
-			if(i%2==0) {
-				// Even Row
-				if(j%2==0) {
-					// Even column - print node
-					// UNFINISED
+	/*
+		ALGORITHM:
+		
+	*/
+	// Row-Wise Array
+	char megaString[10000] = "";
+	int nodeI = 0, nodeJ = 0;
+	int pathI;
+	int nodeK = 0, pathK = 0;
+	// Main Row Loop
+	for(i=0;i<9;i++) {
+		printf("Row Loop\n");
+		// Line-index loop
+		for(j=0;j<5;j++) {
+			printf("Line-index loop\n");
+			printf("nodeK = %d; pathK = %d\n", nodeK, pathK);
+			// Column Loop
+			for(k=0;k<13;k++) {
+				printf("Column loop\n");
+				// Odd-Even system
+				if(k%2==0) {
+					// Even - print node
+					printf("TEST OUTPUT %d %d NODE: %s\n", nodeI, nodeJ, &displayNodes[nodeI][nodeJ].nodeBox[nodeK]);
+					strcat(megaString, &displayNodes[nodeI][nodeJ++].nodeBox[nodeK]);
+					printf("After node cat\n");
 				}
 				else {
-					// Odd column
+					// Odd - print path
+					printf("TEST OUTPUT %d PATH: %s\n", pathI,&displayPaths[pathI].pathBox[pathK]);
+					strcat(megaString, &displayPaths[pathI++].pathBox[pathK]);
+					printf("After path cat\n");
 				}
 			}
-			else {
-				// Odd Row
-			}
+			nodeK += 32;
+			pathK += 14;
+			nodeJ = 0;
+			pathI = i*6;
+			strcat(megaString, "\n");
 		}
+		pathI = i*6;
+		nodeK = 0;
+		pathK = 0;
+		nodeI++;
+		nodeJ = 0;
+		strcat(megaString, "\n");
+		printf("Concat newline\n");
+		printf("%s", megaString);
+		OS_PAUSE();
 	}
+	//printf("%s", megaString);
 	
 	OS_PAUSE();
 }
@@ -518,8 +569,8 @@ void doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], sp
 void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	// Declare applicable lists
 	int initialMovesetSize = 30;
-	spMove *p1 = malloc(sizeof(struct spMoveTag)*initialMovesetSize);
-	spMove *p2 = malloc(sizeof(struct spMoveTag)*initialMovesetSize);
+	struct spMoveTag *p1 = (struct spMoveTag *) malloc(sizeof(struct spMoveTag)*initialMovesetSize);
+	struct spMoveTag *p2 = (struct spMoveTag *) malloc(sizeof(struct spMoveTag)*initialMovesetSize);
 	
 	// Variable Declarations
 	int doExit = 0;
