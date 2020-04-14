@@ -558,9 +558,12 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	}
 
 	// Finally, print the finished grid
-	printf("%s\n", finalDisplay);	
-	
-	OS_PAUSE();
+	printf("%s\n", finalDisplay);
+
+	// Print the grid to a file
+	FILE *grid = fopen("playingGrid.txt", "w");
+	fprintf(grid, "%s", finalDisplay);
+	fclose(grid);
 }
 
 /* This function checks if someone has won the game or not.
@@ -569,6 +572,12 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 int isGameOver(spMove *p1, spMove *p2, int destNode) {
 	
 	return 0;
+}
+
+/* This function flips the player turn.
+*/
+void switchTurn(int *turn) {
+	*turn = !(*turn);
 }
 
 /* This function implements playermoves.
@@ -582,18 +591,125 @@ void doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], sp
 */
 void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	// Declare applicable lists
-	int initialMovesetSize = 30;
+	int initialMovesetSize = 40;
 	struct spMoveTag *p1 = (struct spMoveTag *) malloc(sizeof(struct spMoveTag)*initialMovesetSize);
 	struct spMoveTag *p2 = (struct spMoveTag *) malloc(sizeof(struct spMoveTag)*initialMovesetSize);
 	
 	// Variable Declarations
 	int doExit = 0;
-	int turn = 1;
+	int turn = 1, activePlayer;
+	int nChoice, i, j;
+	int destPoint;
+	char destName[20];
 	
+	do {
+		OS_CLEAR();
+		// Initialize Game
+		displaySPGrid(nodeList, pathList);
+		printf("Alternatively, a text-file version of this grid has also been generated.\n"
+			   "========================================================================\n");
+
+		// Let player select starting-point
+		if(turn) activePlayer = 1;
+		else activePlayer = 2;
+		printf("Player %d:\n"
+			"Enter your starting point. Your starting point must be in the first city on the grid (Muntinlupa).\n"
+			"In other words, the first row of this grid.\n"
+			"Your Choice [Enter Node ID]: ", activePlayer);
+		if(safeIntInput(&nChoice)) {
+			// Check if input is in the first city
+			if(nChoice == 28 || nChoice == 21 || nChoice == 14 || nChoice == 7 || nChoice == 0) {
+				if(turn) {
+					// Player 1
+					p1->newNode = nChoice;
+					p1->distance = 0;
+					p1->totalDistance = 0;
+					// Update nodeList
+					for(i=0; i<MAX_MUNICIPAL; i++) {
+						for(j=0; j<MAX_CITIES; j++) {
+							if(nodeList[i][j].nodeID == p1->newNode)
+								nodeList[i][j].activePlayer = 1;
+						}
+					}
+					doExit = 1;
+				}
+				else {
+					// Player 2
+					p2->newNode = nChoice;
+					p2->distance = 0;
+					p2->totalDistance = 0;
+					// Update nodeList
+					for(i=0; i<MAX_MUNICIPAL; i++) {
+						for(j=0; j<MAX_CITIES; j++) {
+							if(nodeList[i][j].nodeID == p1->newNode)
+								nodeList[i][j].activePlayer = 2;
+						}
+					}
+					doExit = 1;
+				}
+			}
+			else {
+				printf("Starting point must be in the first row (Muntinlupa).\n");
+				OS_PAUSE();
+			}
+		}
+		else {
+			printf("Input must be a valid integer!\n");
+			OS_PAUSE();
+		} 
+	} while(!doExit);
+	
+	doExit = 0;
+	// Select destination point
+	do {
+		OS_CLEAR();
+		// Let player select destination-point
+		if(turn) {
+			// Display Grid
+			displaySPGrid(nodeList, pathList);
+			printf("Destination Point:\n"
+				"Enter your destination point. Your destination point must be in the last city on the grid (Caloocan).\n"
+				"In other words, the last row of this grid.\nThe destination point will be the same for both players.\n"
+				"Your Choice [Enter Node ID]: ");
+			if(safeIntInput(&nChoice)) {
+				// Check if input is in the first city
+				if(nChoice == 34 || nChoice == 27 || nChoice == 20 || nChoice == 13 || nChoice == 6) {
+					if(turn) {
+						// Save Destination Point
+						destPoint = nChoice;
+						doExit = 1;
+					}
+				}
+				else {
+					printf("Destination point must be in the last row (Caloocan).\n");
+					OS_PAUSE();
+				}
+			}
+			else {
+				printf("Input must be a valid integer!\n");
+				OS_PAUSE();
+			} 
+		}
+		else {
+			// Search in nodes
+			for(i=0; i<MAX_MUNICIPAL; i++) 
+				for(j=0; j<MAX_CITIES; j++)
+					if(destPoint == nodeList[i][j].nodeID)
+						strcpy(destName, nodeList[i][j].name);
+			printf("Same with player 1, the destination point is %s.\n", destName);
+		}	
+	} while(!doExit);
+
 	// Main-loop
+	doExit = 0;
 	do {
 		// DISPLAY GRID
 		displaySPGrid(nodeList, pathList);
+		printf("Alternatively, a text-file version of this grid has also been re-generated.\n"
+			   "========================================================================\n");
+
+		// Ask the player for the move
+
 	} while(!doExit);
 	
 	free(p1);
@@ -640,4 +756,3 @@ int shortestPath() {
 	
 	return 0;
 }
-
