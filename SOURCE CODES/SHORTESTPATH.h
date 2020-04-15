@@ -605,7 +605,30 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	Returns 0 for false, 1 for true.
 */
 int isGameOver(int turn, spMove *p1, spMove *p2, int destNode) {
-	
+	// Variable Declarations
+	int i;
+	int nMove;
+
+	if(turn) {
+		// Player 1
+		i = 0;
+		while(p1[i++].distance != -1);
+		nMove = i - 1;
+
+		// Check if the last move is the destination node
+		if(p1[nMove-1].newNode == destNode)
+			return 1;
+	}
+	else {
+		// Player 2
+		i = 0;
+		while(p2[i++].distance != -1);
+		nMove = i - 1;
+
+		// Check if the last move is the destination node
+		if(p2[nMove-1].newNode == destNode)
+			return 1;
+	}
 	return 0;
 }
 
@@ -662,7 +685,9 @@ int doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], spM
 		if(turn) {
 			// Check if valid node [Player 1]
 			if((pathUsed = searchPath(p1[nMove-1].newNode, currentMove, pathList))!=-1) {
-				// Add new move to the moveset array
+				// Add new move to the moveset array & update node to be occupied
+				searchNodes(currentMove, nodeList)->activePlayer = 1;
+				searchNodes(p1[nMove-1].newNode, nodeList)->activePlayer = 0;
 				p1[nMove].newNode = currentMove;
 				p1[nMove].oldNode = p1[nMove-1].newNode;
 				p1[nMove].distance = getPathDistance(pathUsed, pathList);
@@ -679,6 +704,8 @@ int doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], spM
 		else {
 			// Check if valid node [Player 2]
 			if((pathUsed = searchPath(p2[nMove-1].newNode, currentMove, pathList))!=-1) {
+				searchNodes(currentMove, nodeList)->activePlayer = 2;
+				searchNodes(p2[nMove-1].newNode, nodeList)->activePlayer = 0;
 				p2[nMove].newNode = currentMove;
 				p2[nMove].oldNode = p2[nMove-1].newNode;
 				p2[nMove].distance = getPathDistance(pathUsed, pathList);
@@ -843,6 +870,35 @@ void initMoveSet(int size, spMove moveset[]) {
 	}
 }
 
+/*	This function checks the totalDistance and decides who won the game.
+	Returns 0 for draw, 1 for Player 1, 2 for Player 2.
+*/
+int decideWinner(spMove p1[], spMove p2[]) {
+	// Variable Declarations
+	int i, nMove;
+	int distance1, distance2;
+
+	// Decide winner
+	i = 0;
+	while(p1[i++].distance != -1);
+	nMove = i - 1;
+
+	distance1 = p1[nMove-1].totalDistance;
+
+	i = 0;
+	while(p2[i++].distance != -1);
+	nMove = i - 1;
+
+	distance2 = p2[nMove-1].totalDistance;
+
+	if(distance1 < distance2)
+		return 1;
+	else if(distance2 < distance1)
+		return 2;
+
+	return 0;
+}
+
 /* This function is the heart of all the gameplay. It calls all relevant functions
 	and handles all the gameplay. 
 */
@@ -957,8 +1013,9 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 			}
 			else {
 				// Search in nodes
-				strcpy(destName, searchNodes(nChoice, nodeList)->name);
+				strcpy(destName, searchNodes(destPoint, nodeList)->name);
 				printf("Same with player 1, the destination point is %s.\n", destName);
+				doExit = 1;
 			}	
 		} while(!doExit);
 
@@ -985,6 +1042,7 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 			// Ask the player for the move
 			do {
 				printf("Current Node: %s\n", searchNodes(latestNode, nodeList)->name);
+				printf("Fun fact!: %s\n", trivia(searchNodes(latestNode, nodeList)->name));
 				printf("[Player %d | Total Distance: %d units] Enter your move: ", activePlayer, totalDistance);
 				currDistance = doPlayerMove(turn, nodeList, pathList, p1, p2, initialMovesetSize, &latestNode);
 			} while(currDistance==-1);
@@ -997,15 +1055,47 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 
 		} while(!doExit);
 
-		if(turn)
+		if(turn) {
 			// Switch turns
 			switchTurn(&turn);
+			OS_CLEAR();
+			printf("Player 1, you have reached the destination with a total distance of %d units!\n"
+					"Player 2, you're up!\n", totalDistance);
+			OS_PAUSE();
+		}
+			
 		else 
 			// End Game
 			over = 1;
 
 	} while(!over);
+
+	// Decide Winner
+	OS_CLEAR();
+	switch(decideWinner(p1,p2)) {
+		case 0:
+			printf("It's a draw! Congratulations to both players!\n");
+			break;
+		case 1:
+			printf("Player 1 wins the game!\n");
+			break;
+		case 2:
+			printf("Player 2 wins the game!\n");
+	}	
+
+	// Display Game Statistics
+
+	i = 0;
+	while(p1[i++].distance != -1);
+	int nMove = i - 1;
 	
+	printf("Player 1 travled a total distance of: %d units.\n", p1[nMove-1].totalDistance);
+
+	i = 0;
+	while(p1[i++].distance != -1);
+	nMove = i - 1;
+
+	printf("Player 2 travled a total distance of: %d units.\n", p2[nMove-1].totalDistance);
 	
 	free(p1);
 	free(p2);
