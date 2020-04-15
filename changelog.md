@@ -10,3 +10,4 @@ Please write all changes here. Follow the format.
 - [Adi - 04/14/2020] Added Generate Text File Feature for displayGrid in Shortest Path.
 - [Kyle - 04/14/2020] Completed the trivia function.
 - [Adi - 04/15/2020] Appended Kyle's trivia function.
+- [Adi - 04/15/2020] Completed the entire gameplay system for shortest path.
