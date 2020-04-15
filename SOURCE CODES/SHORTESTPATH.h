@@ -660,7 +660,7 @@ int getPathDistance(int pathIndex, spPath pathList[]) {
 
 /* This function asks for and implements playermoves. Returns totalDistance traveled if valid.
 */
-int doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], spMove p1[], spMove p2[], int moveSize, int *newNode) {
+int doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], spMove p1[], spMove p2[], int *newNode) {
 	// Variable Declarations
 	int nMove, i;
 	int currentMove, pathUsed;
@@ -724,7 +724,7 @@ int doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], spM
 	return -1;
 }
 
-char * trivia(char pPlaces[]){
+const char * trivia(char pPlaces[]){
 
 	//Muntinlupa
 	if  (strcmp(pPlaces,"New Bilibid Prison Cemetery")==0) {
@@ -1044,7 +1044,7 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 				printf("Current Node: %s\n", searchNodes(latestNode, nodeList)->name);
 				printf("Fun fact!: %s\n", trivia(searchNodes(latestNode, nodeList)->name));
 				printf("[Player %d | Total Distance: %d units] Enter your move: ", activePlayer, totalDistance);
-				currDistance = doPlayerMove(turn, nodeList, pathList, p1, p2, initialMovesetSize, &latestNode);
+				currDistance = doPlayerMove(turn, nodeList, pathList, p1, p2, &latestNode);
 			} while(currDistance==-1);
 			
 			totalDistance = currDistance;
