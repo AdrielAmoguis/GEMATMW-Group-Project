@@ -302,6 +302,17 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	
 }
 
+/* This function searches the nodeList for the element with the key id.
+	Returns the address of the node found.
+*/
+spNode * searchNodes(int id, spNode nodeList[][MAX_CITIES]) {
+	int i, j;
+	for(i=0;i<MAX_MUNICIPAL;i++)
+		for(j=0;j<MAX_CITIES;j++)
+			if(nodeList[i][j].nodeID == id)
+				return &nodeList[i][j];
+	return NULL;
+}
 /* This function displays the grid. 
 */
 void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
@@ -566,8 +577,8 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	fclose(grid);
 }
 
-/* This function checks if someone has won the game or not.
-	Returns 0 for false, 1 for player 1, 2 for player 2.
+/* This function checks if the destination has been reached.
+	Returns 0 for false, 1 for true.
 */
 int isGameOver(spMove *p1, spMove *p2, int destNode) {
 	
@@ -586,6 +597,140 @@ void doPlayerMove(int turn, spNode nodeList[][MAX_CITIES], spPath pathList[], sp
 	
 }
 
+char * trivia(char pPlaces[]){
+
+	//Muntinlupa
+	if  (strcmp(pPlaces,"New Bilibid Prison Cemetery")==0) {
+		return "A place where the dead lay to rest. It is near the New Bilibid Prison.";				
+	}
+	
+	else if  (strcmp(pPlaces,"Starmall Alabang")==0) {
+		return  "It is formerly called Metropolis Star Alabang. It is built in the 90's.";
+	}
+	
+	else if  (strcmp(pPlaces,"Yexel's Toy Museum")==0) {
+		return  "The museum has amassed over 7000 action figures and 100 life-sized figures. Yexel Sebastian was the owner of all the items in the museum.";
+	}
+	else if  (strcmp(pPlaces,"Jamboree Lake")==0) {
+		return  "It is the smallest natural lake in the philippines. It is once served as a food production unit for the officials and inmates of the New Bilibid Prison.";
+	}
+	else if  (strcmp(pPlaces,"Muntinlupa Sports Complex")==0) {
+		return  "It is used for a variety of activities such as concerts, conferences, reunions and graduation. It has a seating capacity of 3500 and has two seperate multipurpose rooms.";
+	}
+	
+	//Taguig
+	else if  (strcmp(pPlaces,"SM Aura")==0) {
+		return "A large upscale shopping mall located along McKinley Parkway and C5 Road. It is the 13th SM Supermall in Metro Manila.";	
+	}
+	
+	else if  (strcmp(pPlaces,"Bonifacio Global Center")==0) {
+		return  "It is a financial and lifestyle district in Taguig, Metro Manila.It is once part of a multi-hectare portion of Taguig.";
+	}
+	
+	else if  (strcmp(pPlaces,"Mind Museum")==0) {
+		return  "The Mind Museum open its doors to the public on March 16, 2012. The Mind Museum's mission is to initiate and bolster science engagement in elevating aspects of individual, community and national life to inspire solutions to real-world problems.";
+	}
+	else if  (strcmp(pPlaces,"Enderun University")==0) {
+		return  "It is a private non-sectarian undergraduate college. It was established in 2005.";
+	}
+	else if  (strcmp(pPlaces,"Manila American Cemetery")==0) {
+		return  "A cemetery that honors the American and allied servicemen who died fighting the Japanese in World War 2. It offers repose to soldiers who died in the Pacific theater.";
+	}
+	
+	//Pasig
+	else if  (strcmp(pPlaces,"Hampton Gardens")==0) {
+		return "It is a condominium complex that consits of low to medium rise complex towers. The construction of the condominium started in 2008.";	
+	}
+	
+	else if  (strcmp(pPlaces,"St. Paul College Pasig")==0) {
+		return  "A private,  Roman Catholic school exclusively for girls run by the Sisters of St. Paul of Chartres which was founded in France. It was established in 1970.";
+	}
+	
+	else if  (strcmp(pPlaces,"Estancia")==0) {
+		return  "It is located within the Capitol Commons. It  offers a distinctly affluent shopping, dining, and entertainment experience";
+	}
+	else if  (strcmp(pPlaces,"Medical City")==0) {
+		return  "A tertiary care hospital in the Philippines where its health care complex serves some 40,000 in-patients and 400,000 out-patients annually. It was first named as ABM Sison Hospital which was later changed in 1975 to Medical City.";
+	}
+	else if  (strcmp(pPlaces,"C5 Road")==0) {
+		return  "It begun its construction in 1986. It was legally known as President Carlos P. Garcia Avenue, honoring the eighth president of the Republic of the Philippines, Carlos P. Garcia.";
+	}
+
+	//Mandaluyong
+	else if  (strcmp(pPlaces,"Lourdes School of Mandaluyong")==0) {
+		return "It was established by the Capuchin Fathers of the Philippines in 1959. It is a private, Catholic educational institution.";	
+	}
+	
+	else if  (strcmp(pPlaces,"Shaw Boulevard")==0) {
+		return  "It is a highway that connects the cities of Mandaluyong and Pasig. It is named after William James Shaw.";
+	}
+	
+	else if  (strcmp(pPlaces,"EDSA")==0) {
+		return  "It is the longest and the most congested highway in the metropolis. It is named after Epifanio de los Santos.";
+	}
+	else if  (strcmp(pPlaces,"Meralco")==0) {
+		return  "It is the Philippines' largest distributor of electrical power. It is led by Chairman and CEO Manuel M. Lopez, whose family, through direct and indirect holdings, retains control of some 25 percent of the company.";
+	}
+	else if  (strcmp(pPlaces,"La Salle Greenhills")==0) {
+		return  "It is a private Catholic school exclusively for boys located on Ortigas Avenue, Mandaluyong City, Metro Manila. The school opened its door in July 1959.";
+	}
+	
+	//Manila
+	else if  (strcmp(pPlaces,"SM Mall of Asia")==0) {
+		return "It is the fourth largest shooping mall in the Philippines. Owned and developed by SM Prime Holdings, the largest mall chain owner and developer in the Philippines.";	
+	}
+	
+	else if  (strcmp(pPlaces,"De La Salle University")==0) {
+		return  "It was established in 1911 by the Catholic teaching congregation Brothers of the Christian Schools. De La Salle College was granted university status on February 19, 1975.";
+	}
+	
+	else if  (strcmp(pPlaces,"University of Sto Thomas")==0) {
+		return  "The University of Santo Tomas is one of the oldest existing universities and holds the oldest extant university charter in the Philippines and in Asia. It was founded on April 28, 1611.";
+	}
+	else if  (strcmp(pPlaces,"Rizal Park")==0) {
+		return  "It was officially named Rizal Park, after the name of Dr. Jose Rizal, our national hero, as an honor and tribute to him. It is also called Luneta Park because the area looks like a crescent (Lunette).";
+	}
+	else if  (strcmp(pPlaces,"Fort Santiago")==0) {
+		return  "It is a citadel built by Spanish navigator and governor Miguel López de Legazpi for the new established city of Manila in the Philippines. It is built in 1593.";
+	}
+
+	
+	//Quezon
+	else if  (strcmp(pPlaces,"Ateneo de Manila University")==0) {
+		return "It began in 1859 when Spanish Jesuits established the Escuela Municipal de Manila, a public primary school established in Intramuros for the city of Manila. The educational tradition of the Ateneo embraces the much older history of the Jesuits as a teaching order in the Philippines. ";	
+	}
+	else if  (strcmp(pPlaces,"Quezon Memorial Circle")==0) {
+		return  "A national park and a national shrine located in Quezon City, which became the capital of the Philippines from 1948 to 1976. The park is located inside a large traffic circle in the shape of an ellipse and bounded by the Elliptical Road.";
+	}
+	else if  (strcmp(pPlaces,"Eastwood")==0) {
+		return  "It was opened in 1969 with Sears, Strouss, Montgomery Ward, and Woolworth as anchors. It was the first mall to feature both Montgomery Ward and Sears. ";
+	}
+	else if  (strcmp(pPlaces,"Cubao")==0) {
+		return  "The area of Cubao was once friar lands that were part of the District of Morong (now Rizal Province) during the Spanish Occupation (1565-1898). It was named Cubao because of the folk tales spotting hunchbacked (kuba) witches in the area.";
+	}
+	else if  (strcmp(pPlaces,"Araneta Coliseum")==0) {
+		return  "It was constructed from 1957 to late 1959, and designed and built by Architect Dominador Lacson Lugtu and Engrineer Leonardo Onjunco Lugtu. The Coliseum received international recognition and was recognized as the largest covered coliseum in the world.";
+	}
+	
+	//Caloocan
+	else if  (strcmp(pPlaces,"Malabon Zoo")==0) {
+		return "The zoo has a private collection of exotic and Philippine endemic animals. Mr. Manny Tangco collected these animals since 1960's.";	
+	}
+	else if  (strcmp(pPlaces,"La Mesa Nature Reserve")==0) {
+		return  "It is surrounding the La Mesa Reservoir, which is the source of most of the drinking water of Manila. A place where you can go trekking, biking, trail running and bird watching.";
+	}
+	else if  (strcmp(pPlaces,"Glorieta Park")==0) {
+		return  "It was built in the 1970s as part of the wider Makati Commercial Center complex. It was used as a location by Viva Films for its youth-oriented movie Hotshots.";
+	}
+	else if  (strcmp(pPlaces,"San Bartolome Church")==0) {
+		return  "A Roman Catholic church located in Poblacion, Malabon. Established as a visita of Tondo, 21st of May 1599. Became a parish under the patronage of Saint Bartholomew in Tambobong (Malabon today), 17th of May 1614.";
+	}
+	else if  (strcmp(pPlaces,"LRT Caloocan Mall")==0) {
+		return  "It is a home to hundred of stores and outlets that offer a variety of products and services. It is located along Rizal Avenue Extension. The mall entrance is directly adjacent to LRT Monumento Station.";
+	}
+
+}
+
 /* This function is the heart of all the gameplay. It calls all relevant functions
 	and handles all the gameplay. 
 */
@@ -602,9 +747,9 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	int destPoint;
 	char destName[20];
 	
+	// Initialize Game / Select Starting Point
 	do {
 		OS_CLEAR();
-		// Initialize Game
 		displaySPGrid(nodeList, pathList);
 		printf("Alternatively, a text-file version of this grid has also been generated.\n"
 			   "========================================================================\n");
@@ -692,23 +837,28 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 		}
 		else {
 			// Search in nodes
-			for(i=0; i<MAX_MUNICIPAL; i++) 
-				for(j=0; j<MAX_CITIES; j++)
-					if(destPoint == nodeList[i][j].nodeID)
-						strcpy(destName, nodeList[i][j].name);
+			strcpy(destName, searchNodes(nChoice, nodeList)->name);
 			printf("Same with player 1, the destination point is %s.\n", destName);
 		}	
 	} while(!doExit);
 
+	printf("You may now start the game!\n");
+	OS_PAUSE();
+
 	// Main-loop
 	doExit = 0;
 	do {
+		OS_CLEAR();
 		// DISPLAY GRID
 		displaySPGrid(nodeList, pathList);
 		printf("Alternatively, a text-file version of this grid has also been re-generated.\n"
 			   "========================================================================\n");
 
 		// Ask the player for the move
+		printf("Enter your move: ");
+		doPlayerMove(turn, nodeList, pathList, p1, p2);
+
+		// Check for 
 
 	} while(!doExit);
 	
@@ -730,7 +880,7 @@ int shortestPath() {
 	do {
 		// Display game rules & mechanics
 		//OS_CLEAR();
-		printf("Note: Too see the entire map, please keep the terminal window in its biggest possible size.\n"
+		printf("Note: To see the entire map, please keep the terminal window in its biggest possible size.\n"
 			   "===========================================================================================\n"
 			   "\nGAME MECHANICS:\n"
 			   "\nThis game is about speed and smarts.\n"
