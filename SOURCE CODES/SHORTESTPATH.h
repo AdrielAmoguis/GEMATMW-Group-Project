@@ -6,9 +6,9 @@
 		- Node structure systems have been implemented.
 		- Path structure systems have been implemented.
 		- Random distance generation has been implemented.
-		- Gameplay system under implementation.
+		- Gameplay systems have been implemented.
 		- DisplayGrid has been implemented.
-		- Dijkstra's algorithm to be implemented.
+		- Dijkstra's under implementation.
 */
 
 // Library Imports
@@ -337,6 +337,7 @@ spNode * searchNodes(int id, spNode nodeList[][MAX_CITIES]) {
 				return &nodeList[i][j];
 	return NULL;
 }
+
 /* This function displays the grid. 
 */
 void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
@@ -751,7 +752,7 @@ const char * trivia(char pPlaces[]){
 	}
 	
 	else if  (strcmp(pPlaces,"Bonifacio Global Center")==0) {
-		return  "It is a financial and lifestyle district in Taguig, Metro Manila.It is once part of a multi-hectare portion of Taguig.";
+		return  "It is a financial and lifestyle district in Taguig, Metro Manila. It was once part of a multi-hectare portion of Taguig.";
 	}
 	
 	else if  (strcmp(pPlaces,"Mind Museum")==0) {
@@ -899,6 +900,121 @@ int decideWinner(spMove p1[], spMove p2[]) {
 	return 0;
 }
 
+spMove * dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES], spPath pathList[]) {
+	// Declare the return moveset - assume it will be freed by caller
+	int initSPSize = 50;
+	spMove * moveset = (spMove *) malloc(sizeof(struct spMoveTag)*initSPSize);
+	// Catch null memory
+	if(moveset == NULL) {
+		printf("Dijkstra's Algorithm: NOT ENOUGH MEMORY!\n");
+		fprintf(stderr, "Dijkstra's Algorithm: Out of Memory Error!");
+		exit(1);
+	}
+
+	// Initialize Moveset
+	initMoveSet(initSPSize, moveset);
+	moveset->newNode = startpoint;
+	moveset->distance = 0;
+	moveset->totalDistance = 0;
+
+	// Variable Declarations
+	int nMove = 1, i, j;
+	int paths[8], pathBuffer;
+	int currentNode;
+	int lowestFlag;
+	int moveToNode;
+	int newNode;
+
+	// The Flag Structure
+	struct flagTag {
+		int pathID;
+		int totalDistance;
+	} flags[20];
+
+	// Initialize Flags
+	for(i = 0; i < 20; i++) {
+		flags[i].totalDistance = -1;
+		flags[i].pathID = -1;
+	}
+	
+	// Dijkstra's Algorithm - Main Loop
+	// Loop while destination has not been reached
+	while(moveset[nMove-1].newNode != endpoint) {
+		// Assign Current Node
+		currentNode = moveset[nMove-1].newNode;
+
+		// Test Just to see distances
+		displaySPGrid(nodeList, pathList);
+		OS_CLEAR();
+
+		// Index Available Routes
+		j = 0;
+		for(i = 0; i < MAX_PATH; i++) {
+			if(pathList[i].node1 == currentNode || pathList[i].node2 == currentNode) {
+				// Append to the list of available paths
+				paths[j++] = pathList[i].pathID;
+			}
+		}
+		// Fill in empty paths
+		if(j<8)
+			for(i = j; i < 8; i++)
+				paths[i] = -1;
+		// Set Distance flags
+			// Distance flags are set based on the current active paths
+		// Find last flag index
+		j = 0;
+		while(flags[j++].totalDistance!=-1);
+		j--;
+		// Set flags
+		i = 0;
+		while(paths[i]!=-1) {
+			flags[j].pathID = paths[i];
+			flags[j].totalDistance = moveset[nMove-1].totalDistance + pathList[paths[i]].distance;
+			i++; j++;
+		}
+
+		// Test Print Flags
+		j = 0;
+		while(flags[j].totalDistance!=-1) {
+			printf("%d\n", flags[j].pathID);
+			j++;
+		}
+
+		// Select Path to Take - select the flag with the lowest totalDistance
+		i = 0; lowestFlag = 0;
+		while(flags[i].pathID != -1)
+			if(flags[i].totalDistance < flags[lowestFlag].totalDistance) 
+				lowestFlag = i++;
+			else i++;
+		
+		// Do the move
+		if(pathList[flags[lowestFlag].pathID].node1 != currentNode)
+			moveToNode = pathList[flags[lowestFlag].pathID].node1;
+		else 
+			moveToNode = pathList[flags[lowestFlag].pathID].node2;
+
+		// Update moveset
+		moveset[nMove].oldNode = moveset[nMove-1].newNode;
+		moveset[nMove].distance = pathList[flags[lowestFlag].pathID].distance;
+		moveset[nMove].newNode = moveToNode;
+		moveset[nMove].totalDistance = moveset[nMove-1].totalDistance + moveset[nMove].distance;
+		newNode = moveset[nMove].newNode;
+
+		// Test Print new node
+		printf("%d\n", newNode);
+		OS_PAUSE();
+
+		// Update Variables
+		nMove++;
+		currentNode = newNode;
+
+		// Destroy Flags
+		
+	}
+
+	return moveset;
+}
+
 /* This function is the heart of all the gameplay. It calls all relevant functions
 	and handles all the gameplay. 
 */
@@ -907,6 +1023,18 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	int initialMovesetSize = 200;
 	struct spMoveTag *p1 = (struct spMoveTag *) malloc(sizeof(struct spMoveTag)*initialMovesetSize);
 	struct spMoveTag *p2 = (struct spMoveTag *) malloc(sizeof(struct spMoveTag)*initialMovesetSize);
+
+	// Catch null memory
+	if(p1 == NULL) {
+		printf("Gameplay P1: NOT ENOUGH MEMORY!\n");
+		fprintf(stderr, "Gameplay P1: Out of Memory Error!");
+		exit(1);
+	}
+	else if(p2 == NULL) {
+		printf("Gameplay P2: NOT ENOUGH MEMORY!\n");
+		fprintf(stderr, "Gameplay P2: Out of Memory Error!");
+		exit(1);
+	}
 
 	initMoveSet(initialMovesetSize, p1);
 	initMoveSet(initialMovesetSize, p2);
@@ -1110,6 +1238,16 @@ int shortestPath() {
 	setShortestPathNodes(SPNodes);
 	setShortestPathPaths(SPPaths, 1, 999);
 	
+	spMove * dijkstraPath = dijkstra(28,34,SPNodes,SPPaths);
+
+	int i = 0;
+	while(dijkstraPath[i].distance != -1) {
+		printf("%d	%d\n", dijkstraPath[i].newNode, dijkstraPath[i].totalDistance);
+		i++;
+	}
+	free(dijkstraPath);
+
+	/* COMMENTING THE WHOLE MAIN OUT FOR TESTING PURPOSES FOR DIJKSTRA'S ALGORITHM
 	// Variable Declarations
 	char cChoice;
 	do {
@@ -1138,6 +1276,6 @@ int shortestPath() {
 	OS_PAUSE();
 	
 	spGameplay(SPNodes, SPPaths);
-	
+	*/
 	return 0;
 }
