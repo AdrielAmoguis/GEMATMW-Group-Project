@@ -100,14 +100,12 @@ void generateSupply_Demand(int supply[3], int demand[3]){
 }
 // ======================= END OF RNG FUNCTIONS ========================
 
-// =======================  DISPLAY FUNCTIONS ===========================
+//==============================DISPLAY FUNCTIONS====================================
 /*
-	the mode variable is for when the table should display the current remaining stock/original stock. 
-	1 is for just the original
-	2 is for remaining/original
+	MAIN FUNCTIONS FOR DISPLAYING TABLES
 */
 //displays the top part of the table including the first row labels
-void topTable(String28 labels[], int mode){
+void topTable(String28 labels[]){
 	int i;
 	
 	printf("%c", UL_COR);
@@ -115,124 +113,95 @@ void topTable(String28 labels[], int mode){
 		printf("%c", HORI);
 	}
 	printf("%c", U_MID);
-	for(i=0; i<9;i++){
+	for(i=0; i<14;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", U_MID);
-	for(i=0; i<9;i++){
+	for(i=0; i<14;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", U_MID);
-	for(i=0; i<9;i++){
+	for(i=0; i<14;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", U_MID);
-	if(mode==1)
-		for(i=0; i<3;i++){
-			printf("%c", HORI);
-		}
-	else if(mode==2)
-		for(i=0; i<7;i++){
+	for(i=0; i<7;i++){
 			printf("%c", HORI);
 		}
 	printf("%c", UR_COR);
 	printf("\n");
-	if(mode==1)
-		printf("%c%-15s%c%-9s%c%-9s%c%-9s%c%-3s%c\n", VERT, " ", VERT, labels[0], VERT, labels[1], VERT, labels[2], VERT, " ", VERT);
-	else if(mode==2)
-		printf("%c%-15s%c%-9s%c%-9s%c%-9s%c%-7s%c\n", VERT, " ", VERT, labels[0], VERT, labels[1], VERT, labels[2], VERT, " ", VERT);
+	printf("%c%-15s%c%-14s%c%-14s%c%-14s%c%-7s%c\n", VERT, " ", VERT, labels[0], VERT, labels[1], VERT, labels[2], VERT, " ", VERT);
 }
 //prints only the lines in between the middle rows of the table
-void midTable(int mode){
+void midTable(){
 	int i;
 	printf("%c", L_EDGE);
 	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", MID);
-	for(i=0; i<9;i++){
+	for(i=0; i<14;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", MID);
-	for(i=0; i<9;i++){
+	for(i=0; i<14;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", MID);
-	for(i=0; i<9;i++){
+	for(i=0; i<14;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", MID);
-	if(mode==1)
-	for(i=0; i<3;i++){
-		printf("%c", HORI);
-	}
-	else if(mode==2)
+	
 	for(i=0; i<7;i++){
 		printf("%c", HORI);
-	}
+  }
 	printf("%c", R_EDGE);
 	printf("\n");
 }
 //displays the bottom line of the table including the labels in the last wrow
-void botTable(int demand[], int mode, int ogDemand[]){
+void botTable(int demand[],int ogDemand[]){
 	int i;
-	if(mode==1)
-	printf("%c%-15s%c%9d%c%9d%c%9d%c%-3s%c\n", VERT, " ", VERT, demand[0], VERT, demand[1], VERT, demand[2], VERT, " ", VERT);
-	else if(mode==2)
-	printf("%c%-15s%c%5d/%3d%c%5d/%3d%c%5d/%3d%c%-7s%c\n", VERT, " ", VERT, demand[0], ogDemand[0], VERT, demand[1], ogDemand[1], VERT, demand[2], ogDemand[2], VERT, " ", VERT);
+	printf("%c%-15s%c%7d/%-6d%c%7d/%-6d%c%7d/%-6d%c%-7s%c\n", VERT, " ", VERT, demand[0], ogDemand[0], VERT, demand[1], ogDemand[1], VERT, demand[2], ogDemand[2], VERT, " ", VERT);
 	printf("%c", LL_COR);
 	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", L_MID);
-	for(i=0; i<9;i++){
+	for(i=0; i<14;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", L_MID);
-	for(i=0; i<9;i++){
+	for(i=0; i<14;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", L_MID);
-	for(i=0; i<9;i++){
+	for(i=0; i<14;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", L_MID);
-	if(mode==1)
-	for(i=0; i<3;i++){
-		printf("%c", HORI);
-	}
-	else if(mode==2)
+
 	for(i=0; i<7;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", LR_COR);
 }
 //main function for displaying the table
-void displayTable(int supply[], int demand[], Detail details[][3], String28 labels[], int mode, int ogSupply[], int ogDemand[]){
+void displayTable(int supply[], int demand[], Detail details[][3], String28 labels[], int ogSupply[], int ogDemand[]){
 	int i, h=3;
 	
-	if(mode==1){
-		topTable(labels, mode);
+
+	topTable(labels);
 	for(i=0;i<3;i++){
-		midTable(mode);
-		printf("%c%-15s%c%c%d%c%6.2f%c%c%d%c%6.2f%c%c%d%c%6.2f%c%3d%c\n", VERT, labels[h], VERT, '[', 1+3*i,']', details[i][0].price, VERT, '[', 2+3*i,']',details[i][1].price, VERT, '[', 3+3*i, ']' ,details[i][2].price, VERT, supply[i], VERT);
+		midTable();
+		printf("%c%-15s%c%c%d%c%4d|%6.2f%c%c%d%c%4d|%6.2f%c%c%d%c%4d|%6.2f%c%3d/%3d%c\n", VERT, labels[h], VERT, '[', 1+3*i,']', details[i][0].quantity , details[i][0].price, VERT, '[', 2+3*i,']', details[i][1].quantity, details[i][1].price, VERT, '[', 3+3*i,']', details[i][2].quantity, details[i][2].price, VERT, supply[i], ogSupply[i], VERT);
 		h++;
 	}
-	midTable(mode);
-	botTable(demand, mode, ogDemand);
-	}
-	if(mode==2){
-		topTable(labels, mode);
-	for(i=0;i<3;i++){
-		midTable(mode);
-		printf("%c%-15s%c%c%d%c%6.2f%c%c%d%c%6.2f%c%c%d%c%6.2f%c%3d/%3d%c\n", VERT, labels[h], VERT, '[', 1+3*i,']', details[i][0].price, VERT, '[', 2+3*i,']', details[i][1].price, VERT, '[', 3+3*i,']', details[i][2].price, VERT, supply[i], ogSupply[i], VERT);
-		h++;
-	}
-	midTable(mode);
-	botTable(demand, mode, ogDemand);
-	}
+	midTable();
+	botTable(demand, ogDemand);
 }
-// ==================================== END OF DISPLAY FUNCTIONS =================================
+
+// ========================== END OF DISPLAY FUNCTIONS ===============================
 void initializePlayers(Detail details[3][3], Detail player1[3][3], Detail player2[3][3]){
 	int row, col;
 	for (row=0; row<3; row++){
@@ -240,6 +209,7 @@ void initializePlayers(Detail details[3][3], Detail player1[3][3], Detail player
 			player1[row][col].price = details[row][col].price;
 			player1[row][col].quantity = 0;
 			player2[row][col] = player1[row][col];
+			details[row][col] = player1[row][col];
 		}
 	}
 }
@@ -383,12 +353,12 @@ int transpoProblem() {
 		initializePlayers(details, player1, player2);
 		copySupplyDemand(ogSupply, ogDemand, supply, demand);
 		
-		displayTable(supply, demand, details, labels, 1, ogSupply, ogDemand);		// have to change to display player only	
+		displayTable(supply, demand, details, labels, ogSupply, ogDemand);		// have to change to display player only	
 		tutorial();
 		
 		do{
 			printf("\t\tPlayer 1's Table\n");
-			displayTable(supply, demand, player1, labels, 2, ogSupply, ogDemand);
+			displayTable(supply, demand, player1, labels, ogSupply, ogDemand);
 			pos=getPos(pos); 
 			fillTable(supply, demand, player1, pos);
 			if (isComplete(supply, demand)){
