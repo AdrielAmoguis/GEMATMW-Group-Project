@@ -302,17 +302,17 @@ void fillTable(int supply[3], int demand[3], Detail player[3][3], int pos){
 				*storedQuant = tempQuant;
 			}
 			else{
-				printf("Quantity exceeds demand of [%d], please allocate a lesser quantity...\n\n",  demand[col]);
+				printf("Quantity exceeds demand of [%d], please allocate a lesser quantity...\n\n",  *storedQuant + demand[col]);
 				invalid = 1;
 				OS_PAUSE();
-				OS_CLEAR();
+				// OS_CLEAR(); need to display table again
 			}
 		}
 		else{
-			printf("Quantity exceeds supply [%d]: please allocate a lesser quantity...\n\n", supply[row]);
+			printf("Quantity exceeds supply [%d]: please allocate a lesser quantity...\n\n", *storedQuant + supply[row]);
 			invalid = 1;
 			OS_PAUSE();
-			OS_CLEAR();
+			//OS_CLEAR(); need to display table again
 		}
 			
 	}while(invalid == 1);
