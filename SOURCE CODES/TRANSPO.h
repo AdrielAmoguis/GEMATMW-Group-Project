@@ -365,16 +365,47 @@ int isComplete(int supply[3], int demand[3]){
 int transpoProblem() {
 	// ================== Variable Declarations =================
   	//Gian's Variables
-
+	String28 labels[6]={"LUZON","VISAYAS", "MINDANAO", "DHL AIRMAIL", "LBC LAND" , "PARCEL SHIPPING"};
   	//Ben's variables
-  	Detail details[3][3];
-  	int supply[3], demand[3];
+  	Detail details[3][3], player1[3][3], player2[3][3];
+  	int ogSupply[3], int ogDemand[3], supply[3], demand[3];
+	int sum_stocks, nOption, over = 0, pos;
+	char cOption;
+	time_t t;
   	// ================== End of Variable Declarations ============
   
-  	printf("%c%c%c%c%c%c%c", UL_COR, HORI, HORI, HORI, HORI, HORI, UR_COR);
-  	printf("%cgoma goma hindi%c\n", VERT, VERT);
-
-	generatePrice(details);
-	generateSupply_Demand(supply, demand);
-	return 0;
+  	srand( (unsigned) time(&t));
+	startMenu(&nOption);
+	if (nOption == 1){
+		system("cls");
+		generatePrice(details);
+		generateSupply_Demand(ogSupply, ogDemand);
+		initializePlayers(details, player1, player2);
+		copySupplyDemand(ogSupply, ogDemand, supply, demand);
+		
+		displayTable(supply, demand, details, labels, 1, ogSupply, ogDemand);		// have to change to display player only	
+		tutorial();
+		
+		do{
+			printf("\t\tPlayer 1's Table\n");
+			displayTable(supply, demand, player1, labels, 2, ogSupply, ogDemand);
+			pos=getPos(pos); 
+			fillTable(supply, demand, player1, pos);
+			if (isComplete(supply, demand)){
+				printf("\nAll allocations completed... End your turn? [Y/N]: ");
+				scanf(" %c", &cOption);
+				if (cOption == 'Y' || cOption == 'y')
+					over = 1;
+				else if (cOption == 'N' || cOption == 'n'){
+					printf("\n\nEdit the quantities that you wish to change\n\n");
+					OS_PAUSE();
+					OS_CLEAR();
+				}
+			}
+			//check if all information is filled
+			//if all is filled, prompt user to confirm		
+		}while(!over);	// calculate for total cost, then repeat for player 2
+		
+	}
+  return 0;
 }
