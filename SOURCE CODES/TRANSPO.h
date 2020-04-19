@@ -331,10 +331,10 @@ int isComplete(int supply[3], int demand[3]){
 }
 
 /*
-	1. Calculates a player's total price
+	1. Calculates total price
 	2. Returns a float representing the total price
 */
-float calculatePlayerCost(Detail player[3][3]){
+float calculateCost(Detail player[3][3]){
 	float total = 0;
 	int row, col;
 	for (row = 0; row < 3; row++){
@@ -368,14 +368,25 @@ void nwCornerRule(Detail best[3][3], int supply[3], int demand[3]){
 		}
 	}
 }
+/*
+	1. Checks if there exists same quantity for row n and column n
+*/
+int checkDegenerate(int ogSupply[3], int ogDemand[3]){
+	int i, degenerate = 0;
+	for (i=0; i<3 && !degenerate; i++)
+		if (ogSupply[i] == ogDemand[i])
+			degenerate = 1;
+
+	return degenerate;
+}
 /* HEADER MAIN FUNCTION */
 int transpoProblem() {
 	// ================== Variable Declarations =================
   	//Gian's Variables
 	String28 labels[6]={"LUZON","VISAYAS", "MINDANAO", "DHL AIRMAIL", "LBC LAND" , "PARCEL SHIPPING"};
   	//Ben's variables
-  	Detail details[3][3], player1[3][3], player2[3][3];
-  	int ogSupply[3], int ogDemand[3], supply[3], demand[3];
+  	Detail details[3][3], player1[3][3], player2[3][3], best[3][3];
+  	int ogSupply[3], int ogDemand[3], supply[3], demand[3], degenerate;
 	int sum_stocks, nOption, over = 0, pos;
 	char cOption;
 	time_t t;
@@ -385,9 +396,16 @@ int transpoProblem() {
 	startMenu(&nOption);
 	if (nOption == 1){
 		system("cls");
+		do{
+			generatePrice(details);
+			generateSupply_Demand(ogSupply, ogDemand);
+			degenerate = checkDegenerate(ogSupply, ogDemand);		
+			if (degenerate)
+				printf("Degenerate case: generating random numbers again\n\n");		// for test case, can remove for final product
+		}while(degenerate);
 		generatePrice(details);
 		generateSupply_Demand(ogSupply, ogDemand);
-		initializePlayers(details, player1, player2);
+		initializePlayers(details, player1, player2, best);
 		copySupplyDemand(ogSupply, ogDemand, supply, demand);
 		
 		displayTable(supply, demand, details, labels, ogSupply, ogDemand);		// have to change to display player only	
@@ -416,7 +434,7 @@ int transpoProblem() {
 			//if all is filled, prompt user to confirm		
 		}while(!over);	// calculate for total cost, then repeat for player 2
 		
-		total1 = calculatePlayerCost(player1);	//display this afterwards
+		total1 = calculateCost(player1);	//display this afterwards
 		
 		//reset supply, demand, and over
 		copySupplyDemand(ogSupply, ogDemand, supply, demand);
@@ -440,7 +458,7 @@ int transpoProblem() {
 			//check if all information is filled
 			//if all is filled, prompt user to confirm		
 		}while(!over);
-		total2= calculatePlayerCost(player2);	//display this afterwards
+		total2= calculateCost(player2);	//display this afterwards
 		
 		//implement northwest corner rule and stepping stone method algorithm here
 	}
