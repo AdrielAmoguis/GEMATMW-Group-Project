@@ -370,7 +370,7 @@ int transpoProblem() {
 		tutorial();
 		
 		do{
-			printf("\t\tPlayer 1's Table\n");
+			printf("\t\t\tPlayer 1's Table\n");
 			displayTable(supply, demand, player1, labels, ogSupply, ogDemand);
 			pos=getPos(pos); 
 			fillTable(supply, demand, player1, pos);
@@ -395,7 +395,7 @@ int transpoProblem() {
 		copySupplyDemand(ogSupply, ogDemand, supply, demand);
 		over = 0;
 		do{
-			printf("\t\tPlayer 2's Table\n");
+			printf("\t\t\tPlayer 2's Table\n");
 			displayTable(supply, demand, player2, labels, 2, ogSupply, ogDemand);
 			pos=getPos(pos); 
 			fillTable(supply, demand, player2, pos);
