@@ -206,10 +206,9 @@ void initializePlayers(Detail details[3][3], Detail player1[3][3], Detail player
 	int row, col;
 	for (row=0; row<3; row++){
 		for (col=0; col<3; col++){
-			player1[row][col].price = details[row][col].price;
-			player1[row][col].quantity = 0;
-			player2[row][col] = player1[row][col];
-			details[row][col] = player1[row][col];
+			details[row][col].quantity = 0;
+			player1[row][col] = details[row][col];
+			player2[row][col] = details[row][col];
 		}
 	}
 }
@@ -330,6 +329,20 @@ int isComplete(int supply[3], int demand[3]){
 			nComplete = 0;
 	return nComplete; 
 }
+
+/*
+	1. Calculates a player's total price
+	2. Returns a float representing the total price
+*/
+float calculatePlayerCost(Detail player[3][3]){
+	float total = 0;
+	int row, col;
+	for (row = 0; row < 3; row++){
+		for (col = 0; col < 3; col++)
+			total = player[row][col].quantity * player[row][col].price;
+	}
+	return total;
+}
 // ========================= End of Turn Functions ===================
 /* HEADER MAIN FUNCTION */
 int transpoProblem() {
@@ -369,13 +382,40 @@ int transpoProblem() {
 				else if (cOption == 'N' || cOption == 'n'){
 					printf("\n\nEdit the quantities that you wish to change\n\n");
 					OS_PAUSE();
+				}
+			}
+			//OS_CLEAR();
+			//check if all information is filled
+			//if all is filled, prompt user to confirm		
+		}while(!over);	// calculate for total cost, then repeat for player 2
+		
+		total1 = calculatePlayerCost(player1);	//display this afterwards
+		
+		//reset supply, demand, and over
+		copySupplyDemand(ogSupply, ogDemand, supply, demand);
+		over = 0;
+		do{
+			printf("\t\tPlayer 2's Table\n");
+			displayTable(supply, demand, player2, labels, 2, ogSupply, ogDemand);
+			pos=getPos(pos); 
+			fillTable(supply, demand, player2, pos);
+			if (isComplete(supply, demand)){
+				printf("\nAll allocations completed... End your turn? [Y/N]: ");
+				scanf(" %c", &cOption);
+				if (cOption == 'Y' || cOption == 'y')
+					over = 1;
+				else if (cOption == 'N' || cOption == 'n'){
+					printf("\n\nEdit the quantities that you wish to change\n\n");
+					OS_PAUSE();
 					OS_CLEAR();
 				}
 			}
 			//check if all information is filled
 			//if all is filled, prompt user to confirm		
-		}while(!over);	// calculate for total cost, then repeat for player 2
+		}while(!over);
+		total2= calculatePlayerCost(player2);	//display this afterwards
 		
+		//implement northwest corner rule and stepping stone method algorithm here
 	}
   return 0;
 }
