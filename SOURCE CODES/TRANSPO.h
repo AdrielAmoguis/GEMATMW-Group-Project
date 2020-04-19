@@ -344,6 +344,30 @@ float calculatePlayerCost(Detail player[3][3]){
 	return total;
 }
 // ========================= End of Turn Functions ===================
+
+/*
+	1. Northwest Corner Rule
+*/
+
+void nwCornerRule(Detail best[3][3], int supply[3], int demand[3]){
+	int row, col;
+	for(row = 0; row < 3; row++){
+		for (col = 0; col < 3; col++){
+			if (supply[row] >= demand[col]){ 	// if supply is sufficient to fill demand
+				best[row][col].quantity = demand[col];		// fill block with demand
+				supply[row] -= demand[col];					// deduct supplies with total column's total demand
+				demand[col] -= demand[col];					// set demand to 0
+			}
+			else if (supply[row] < demand[col] && supply[row] != 0){ // if supply is insufficient but can still allocate some
+ 				best[row][col].quantity = supply[row];		// fill block with remaining supplies
+				demand[col] -= supply[row];					// reduce demand with remaining supplies
+				supply[row] -= supply[row];					// set supplies to 0
+			}
+			else	// cannot allocate anything
+				best[row][col].quantity = 0;				// fill block with 0 quantity
+		}
+	}
+}
 /* HEADER MAIN FUNCTION */
 int transpoProblem() {
 	// ================== Variable Declarations =================
@@ -368,7 +392,10 @@ int transpoProblem() {
 		
 		displayTable(supply, demand, details, labels, ogSupply, ogDemand);		// have to change to display player only	
 		tutorial();
-		
+		//===================================== temporary placement of nwCornerRule for testing
+		nwCornerRule(best, supply, demand);
+		displayTable(supply, demand, best, labels, ogSupply, ogDemand);
+		//=====================================
 		do{
 			printf("\t\t\tPlayer 1's Table\n");
 			displayTable(supply, demand, player1, labels, ogSupply, ogDemand);
