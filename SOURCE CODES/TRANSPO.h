@@ -403,8 +403,6 @@ int transpoProblem() {
 			if (degenerate)
 				printf("Degenerate case: generating random numbers again\n\n");		// for test case, can remove for final product
 		}while(degenerate);
-		generatePrice(details);
-		generateSupply_Demand(ogSupply, ogDemand);
 		initializePlayers(details, player1, player2, best);
 		copySupplyDemand(ogSupply, ogDemand, supply, demand);
 		
