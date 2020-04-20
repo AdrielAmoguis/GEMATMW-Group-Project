@@ -2,13 +2,14 @@
 	GEMATMW PROJECT
 	SHORTEST PATH MODULE
 	
-	DEVELOPMENT NOTES [Last updated: 10:35 PM - 04/11/2020]:
+	DEVELOPMENT NOTES [Last updated: 2:16 AM - 04/21/2020]:
 		- Node structure systems have been implemented.
 		- Path structure systems have been implemented.
 		- Random distance generation has been implemented.
 		- Gameplay systems have been implemented.
 		- DisplayGrid has been implemented.
-		- Dijkstra's under implementation.
+		- Dijkstra's Function has been implemented.
+		- Finalizing the SP Module
 */
 
 // Library Imports
@@ -56,6 +57,11 @@ typedef struct spMoveTag {
 	int totalDistance;
 } spMove;
 
+typedef struct spDijkstraTag {
+	int distance;
+	int path[MAX_NODES];
+} spDijkstra;
+
 // User-Defined Functions
 
 // SECONDARY FUNCTIONS
@@ -96,6 +102,44 @@ int spSafeIntInput(int *x) {
 	}
 	
 	return 0;
+}
+
+/* This function is a utility function that gets the sum of an integer array.
+*/
+int getArrSum(int arr[], int size) {
+	int i, sum = 0;
+	for(i=0;i<size;i++) {
+		sum += arr[i];
+	}
+	return sum;
+}
+
+/* This function appends an integer into an interger array.
+	Array must be initialized with -1.
+*/
+void intAppendArr(int arr[], int key) {
+	// Get last index
+	int i;
+	while(arr[i++]!=-1);
+	// Append
+	arr[--i] = key;
+}
+
+/*	This function finds and returns the index of the minimum value in the array.
+	Return value is an array of size 2 that holds i and j. Assumes the caller calls free.
+*/
+int getArrMin(int arr[], int dist[]) {
+	int minIndex;
+	int min = INT_MAX;
+	int i, j;
+
+	for(i = 0; i < MAX_NODES; i++)
+		if(arr[i] < min && dist[i]==0) {
+			min = arr[i];
+			minIndex = i;
+		}
+
+	return minIndex;
 }
 
 // PRIMARY FUNCTIONS
@@ -902,28 +946,135 @@ int decideWinner(spMove p1[], spMove p2[]) {
 	return 0;
 }
 
-spMove * dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES], spPath pathList[]) {
+/* Recursive function that processes the return value for Dijkstra's Algorithm.
+*/
+void processPath(int parent[], int pathArr[] ,int x) {
+	// Recursive Funciton
+	printf("Recursion!\n");
+	// Base Case : X is source
+	if(parent[x] == -1)
+		return;
+
+	processPath(parent, pathArr, parent[x]);
+
+	printf("Appending path!\n");
+	intAppendArr(pathArr, x);
+}
+
+/*	This function calculates and returns the shortest route to get from startpoint to endpoint.
+*/
+spDijkstra dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	// Declare the return moveset - assume it will be freed by caller
-	int initSPSize = MAX_NODES;
-	spMove * moveset = (spMove *) malloc(sizeof(struct spMoveTag)*initSPSize);
-	// Catch null memory
-	if(moveset == NULL) {
-		printf("Dijkstra's Algorithm: NOT ENOUGH MEMORY!\n");
-		fprintf(stderr, "Dijkstra's Algorithm: Out of Memory Error!");
-		exit(1);
-	}
-
-	// Matrix Declarations
-	int costMatrix[MAX_MUNICIPAL*MAX_CITIES][MAX_MUNICIPAL*MAX_CITIES];
-
+	spDijkstra moveset;
 
 	// Variable Declarations
-	
+	const int infinity = INT_MAX;
+	int i, j, k, l;
+	int availPaths[8];
+	int found;
+	int min = infinity;
+	int visited[35];
+	int distance[35];
+	int u, v;
+	int nMove = 0;
+	int parent[MAX_NODES];
 
-	// Operations:
+	// Generate the Graph in the orientation of the gameplay
+	// The graph or costMatrix an NxN matrix where N is the number of nodes in total.
+	// The costMatrix contains the distances between nodes
+	int costMatrix[MAX_CITIES*MAX_MUNICIPAL][MAX_CITIES*MAX_MUNICIPAL];
 
-	// 1. Calculate the elements of the cost matrix.
+	// Initialize costMatrix
+	for(i = 0; i < MAX_NODES; i++)
+		for(j = 0; j < MAX_NODES; j++)
+			costMatrix[i][j] = 0;
+
+	// TASK 1: Populate the costMatrix array
+	// We fill in all of the distances given the nodeID.
+	for(i = 0; i < MAX_NODES; i++) {
+		for(j = 0; j < MAX_NODES; j++) {
+			// So in this sense, node1 = i; node2 = j.
+			// We need to search for paths that connect node1 and node2.
+			// The distance that this path is carrying will then be used to populate \
+				that specific cell in the costMatrix.
+			// Task 1.1: Search for paths that connect node1 and node2.
+			// Task 1.1.1: Commence the search.
+			// Base case: startpoint
+			if(i == startpoint && j == startpoint)
+				costMatrix[i][j] = 0;
+			found = 0;
+			for(l = 0; l < MAX_PATH; l++) {
+				if((pathList[l].node1 == i && pathList[l].node2 == j) || (pathList[l].node1 == j && pathList[l].node2 == i)) {
+					costMatrix[j][i] = costMatrix[i][j] = pathList[l].distance;
+					found = 1;
+				}
+			}
+		}
+	}
 	
+	OS_PAUSE();
+
+	// Initialize all distances as INFINITE
+	for(i = 0; i < MAX_NODES; i++) {
+		distance[i] = infinity;
+		visited[i] = 0;
+	}
+
+	// Initialize Parent
+	parent[startpoint] = -1;
+
+	// First distance
+	distance[startpoint] = 0;	
+	OS_PAUSE();
+
+	// TASK 3: Perform the Dijkstra's Algorithm. Pseudocode: https://www.geeksforgeeks.org/c-program-for-dijkstras-shortest-path-algorithm-greedy-algo-7/
+	for(i = 0; i < MAX_NODES - 1; i++) {
+		// Pick the minimum distance vertex from the distances array. Must also not be visited yet.
+		// Find minimum
+		u = getArrMin(distance, visited);
+
+		// Mark u as visited
+		visited[u] = 1;
+
+		// Update the distances of all nodes connected to u
+		// Check if attached by an edge
+		for(l = 0; l < MAX_PATH; l++) {
+			if((pathList[l].node1 == u)) {
+				v = pathList[l].node2;
+				// Check if conditions are met
+				if(!(visited[v]) && distance[u] != infinity)
+					if(distance[u] + costMatrix[u][v] < distance[v]) {
+						distance[v] = distance[u] + costMatrix[u][v];
+						costMatrix[startpoint][v] = distance[v];
+						parent[v] = u;
+					}						
+			}
+			else if(pathList[l].node2 == u) {
+				v = pathList[l].node1;
+				// Check if conditions are met
+				if(!(visited[v]) && distance[u] != infinity)
+					if(distance[u] + costMatrix[u][v] < distance[v]) {
+						distance[v] = distance[u] + costMatrix[u][v];
+						costMatrix[startpoint][v] = distance[v];
+						parent[v] = u;
+					}	
+			}
+		}
+		
+	}
+
+	// Process return value
+	/*
+		The return value consits of:
+			a. The distance from startpoint to endpoint
+			b. The array of integers that is the path.
+	*/
+	moveset.distance = distance[endpoint];
+	// Initialize the array first
+	for(i = 0; i < MAX_NODES; i++)
+		moveset.path[i] = -1;
+	// Call recursive function
+	processPath(parent, moveset.path, endpoint);
 
 	return moveset;
 }
@@ -1150,15 +1301,6 @@ int shortestPath() {
 	spPath SPPaths[MAX_PATH];
 	setShortestPathNodes(SPNodes);
 	setShortestPathPaths(SPPaths, 1, 999);
-	
-	spMove * dijkstraPath = dijkstra(28,34,SPNodes,SPPaths);
-
-	int i = 0;
-	while(dijkstraPath[i].distance != -1) {
-		printf("%d	%d\n", dijkstraPath[i].newNode, dijkstraPath[i].totalDistance);
-		i++;
-	}
-	free(dijkstraPath);
 
 	/* COMMENTING THE WHOLE MAIN OUT FOR TESTING PURPOSES FOR DIJKSTRA'S ALGORITHM
 	// Variable Declarations
