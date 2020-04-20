@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 
 // DETERMINE OPERATING SYSTEM
 #if _WIN32 || _WIN64
@@ -54,6 +55,7 @@ typedef struct spMoveTag {
 	int distance;
 	int totalDistance;
 } spMove;
+
 // User-Defined Functions
 
 // SECONDARY FUNCTIONS
@@ -902,7 +904,7 @@ int decideWinner(spMove p1[], spMove p2[]) {
 
 spMove * dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	// Declare the return moveset - assume it will be freed by caller
-	int initSPSize = 50;
+	int initSPSize = MAX_NODES;
 	spMove * moveset = (spMove *) malloc(sizeof(struct spMoveTag)*initSPSize);
 	// Catch null memory
 	if(moveset == NULL) {
@@ -911,106 +913,17 @@ spMove * dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES], s
 		exit(1);
 	}
 
-	// Initialize Moveset
-	initMoveSet(initSPSize, moveset);
-	moveset->newNode = startpoint;
-	moveset->distance = 0;
-	moveset->totalDistance = 0;
+	// Matrix Declarations
+	int costMatrix[MAX_MUNICIPAL*MAX_CITIES][MAX_MUNICIPAL*MAX_CITIES];
+
 
 	// Variable Declarations
-	int nMove = 1, i, j;
-	int paths[8], pathBuffer;
-	int currentNode;
-	int lowestFlag;
-	int moveToNode;
-	int newNode;
-
-	// The Flag Structure
-	struct flagTag {
-		int pathID;
-		int totalDistance;
-	} flags[20];
-
-	// Initialize Flags
-	for(i = 0; i < 20; i++) {
-		flags[i].totalDistance = -1;
-		flags[i].pathID = -1;
-	}
 	
-	// Dijkstra's Algorithm - Main Loop
-	// Loop while destination has not been reached
-	while(moveset[nMove-1].newNode != endpoint) {
-		// Assign Current Node
-		currentNode = moveset[nMove-1].newNode;
 
-		// Test Just to see distances
-		displaySPGrid(nodeList, pathList);
-		OS_CLEAR();
+	// Operations:
 
-		// Index Available Routes
-		j = 0;
-		for(i = 0; i < MAX_PATH; i++) {
-			if(pathList[i].node1 == currentNode || pathList[i].node2 == currentNode) {
-				// Append to the list of available paths
-				paths[j++] = pathList[i].pathID;
-			}
-		}
-		// Fill in empty paths
-		if(j<8)
-			for(i = j; i < 8; i++)
-				paths[i] = -1;
-		// Set Distance flags
-			// Distance flags are set based on the current active paths
-		// Find last flag index
-		j = 0;
-		while(flags[j++].totalDistance!=-1);
-		j--;
-		// Set flags
-		i = 0;
-		while(paths[i]!=-1) {
-			flags[j].pathID = paths[i];
-			flags[j].totalDistance = moveset[nMove-1].totalDistance + pathList[paths[i]].distance;
-			i++; j++;
-		}
-
-		// Test Print Flags
-		j = 0;
-		while(flags[j].totalDistance!=-1) {
-			printf("%d\n", flags[j].pathID);
-			j++;
-		}
-
-		// Select Path to Take - select the flag with the lowest totalDistance
-		i = 0; lowestFlag = 0;
-		while(flags[i].pathID != -1)
-			if(flags[i].totalDistance < flags[lowestFlag].totalDistance) 
-				lowestFlag = i++;
-			else i++;
-		
-		// Do the move
-		if(pathList[flags[lowestFlag].pathID].node1 != currentNode)
-			moveToNode = pathList[flags[lowestFlag].pathID].node1;
-		else 
-			moveToNode = pathList[flags[lowestFlag].pathID].node2;
-
-		// Update moveset
-		moveset[nMove].oldNode = moveset[nMove-1].newNode;
-		moveset[nMove].distance = pathList[flags[lowestFlag].pathID].distance;
-		moveset[nMove].newNode = moveToNode;
-		moveset[nMove].totalDistance = moveset[nMove-1].totalDistance + moveset[nMove].distance;
-		newNode = moveset[nMove].newNode;
-
-		// Test Print new node
-		printf("%d\n", newNode);
-		OS_PAUSE();
-
-		// Update Variables
-		nMove++;
-		currentNode = newNode;
-
-		// Destroy Flags
-		
-	}
+	// 1. Calculate the elements of the cost matrix.
+	
 
 	return moveset;
 }
