@@ -9,7 +9,11 @@
 		- Gameplay systems have been implemented.
 		- DisplayGrid has been implemented.
 		- Dijkstra's Function has been implemented.
-		- Finalizing the SP Module
+		- Finished the actual SP module
+		- Debugging:
+			+ Issue found: There are cases where players' distance < spDistance
+							This is a major flaw. It implies that the Dijkstra's algorithm does not work.
+							Review the Dijkstra's algo.
 */
 
 // Library Imports
@@ -386,7 +390,7 @@ spNode * searchNodes(int id, spNode nodeList[][MAX_CITIES]) {
 
 /* This function displays the grid. 
 */
-void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
+void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGrid) {
 	// Variable Declarations
 	int i, j, k;
 
@@ -646,6 +650,12 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	FILE *grid = fopen("playingGrid.txt", "w");
 	fprintf(grid, "%s", finalDisplay);
 	fclose(grid);
+
+	#if _WIN32 || _WIN64
+	// Open the Grid in Notepad
+	if(openGrid)
+		system("start notepad playingGrid.txt");
+	#endif
 }
 
 /* This function checks if the destination has been reached.
@@ -950,14 +960,12 @@ int decideWinner(spMove p1[], spMove p2[]) {
 */
 void processPath(int parent[], int pathArr[] ,int x) {
 	// Recursive Funciton
-	printf("Recursion!\n");
 	// Base Case : X is source
 	if(parent[x] == -1)
 		return;
 
 	processPath(parent, pathArr, parent[x]);
 
-	printf("Appending path!\n");
 	intAppendArr(pathArr, x);
 }
 
@@ -1011,8 +1019,6 @@ spDijkstra dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES],
 			}
 		}
 	}
-	
-	OS_PAUSE();
 
 	// Initialize all distances as INFINITE
 	for(i = 0; i < MAX_NODES; i++) {
@@ -1024,8 +1030,7 @@ spDijkstra dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES],
 	parent[startpoint] = -1;
 
 	// First distance
-	distance[startpoint] = 0;	
-	OS_PAUSE();
+	distance[startpoint] = 0;
 
 	// TASK 3: Perform the Dijkstra's Algorithm. Pseudocode: https://www.geeksforgeeks.org/c-program-for-dijkstras-shortest-path-algorithm-greedy-algo-7/
 	for(i = 0; i < MAX_NODES - 1; i++) {
@@ -1082,7 +1087,7 @@ spDijkstra dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES],
 /* This function is the heart of all the gameplay. It calls all relevant functions
 	and handles all the gameplay. 
 */
-void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
+int spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGrid) {
 	// Declare and initialize applicable lists
 	int initialMovesetSize = 200;
 	struct spMoveTag *p1 = (struct spMoveTag *) malloc(sizeof(struct spMoveTag)*initialMovesetSize);
@@ -1107,16 +1112,19 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	int doExit = 0, over = 0, totalDistance = 0, currDistance = 0;
 	int turn = 1, activePlayer;
 	int nChoice, i, j;
+	int startpoint1;
+	int startpoint2;
 	int destPoint;
 	char destName[20];
 	int latestNode;
+	int winner = 0;
 	
 	// Loop for both players
 	do {
 		// Initialize Game / Select Starting Point
 		do {
 			OS_CLEAR();
-			displaySPGrid(nodeList, pathList);
+			displaySPGrid(nodeList, pathList, openGrid);
 			printf("Alternatively, a text-file version of this grid has also been generated.\n"
 				"========================================================================\n");
 
@@ -1132,6 +1140,7 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 				if(nChoice == 28 || nChoice == 21 || nChoice == 14 || nChoice == 7 || nChoice == 0) {
 					if(turn) {
 						// Player 1
+						startpoint1 = nChoice;
 						p1->newNode = nChoice;
 						p1->distance = 0;
 						p1->totalDistance = 0;
@@ -1147,6 +1156,7 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 					}
 					else {
 						// Player 2
+						startpoint2 = nChoice;
 						p2->newNode = nChoice;
 						p2->distance = 0;
 						p2->totalDistance = 0;
@@ -1179,7 +1189,7 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 			// Let player select destination-point
 			if(turn) {
 				// Display Grid
-				displaySPGrid(nodeList, pathList);
+				displaySPGrid(nodeList, pathList, openGrid);
 				printf("Destination Point:\n"
 					"Enter your destination point. Your destination point must be in the last city on the grid (Caloocan).\n"
 					"In other words, the last row of this grid.\nThe destination point will be the same for both players.\n"
@@ -1220,7 +1230,7 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 		do {
 			OS_CLEAR();
 			// DISPLAY GRID
-			displaySPGrid(nodeList, pathList);
+			displaySPGrid(nodeList, pathList, openGrid);
 			printf("Alternatively, a text-file version of this grid has also been re-generated.\n"
 				"========================================================================\n");
 
@@ -1267,30 +1277,65 @@ void spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[]) {
 	switch(decideWinner(p1,p2)) {
 		case 0:
 			printf("It's a draw! Congratulations to both players!\n");
+			winner = 0;
 			break;
 		case 1:
 			printf("Player 1 wins the game!\n");
+			winner = 1;
 			break;
 		case 2:
 			printf("Player 2 wins the game!\n");
+			winner = 2;
 	}	
 
 	// Display Game Statistics
 
+	printf("Player 1 took the path: \n");
 	i = 0;
-	while(p1[i++].distance != -1);
+	while(p1[i].distance != -1) {
+		printf("%s\n", searchNodes(p1[i++].newNode, nodeList)->name);
+	}
 	int nMove = i - 1;
 	
-	printf("Player 1 travled a total distance of: %d units.\n", p1[nMove-1].totalDistance);
+	printf("Player 1 travled a total distance of: %d units.\n\n", p1[nMove-1].totalDistance);
+
+	printf("Player 2 took the path: \n");
 
 	i = 0;
-	while(p1[i++].distance != -1);
+	while(p2[i].distance != -1) {
+		printf("%s\n", searchNodes(p2[i++].newNode, nodeList)->name);
+	}
 	nMove = i - 1;
 
 	printf("Player 2 travled a total distance of: %d units.\n", p2[nMove-1].totalDistance);
+
+	// DISPLAY SHORTEST PATH SOLUTIONS FOR BOTH PLAYERS
+
+	spDijkstra sp1, sp2;
+	sp1 = dijkstra(startpoint1, destPoint, nodeList, pathList);
+	sp2 = dijkstra(startpoint2, destPoint, nodeList, pathList);
+
+	printf("Shortest Distance from Player 1's Starting Point (%s) to Destination (%s): %d units.\n", searchNodes(startpoint1, nodeList)->name, searchNodes(destPoint, nodeList)->name, sp1.distance);
+	printf("Shortest Path: \n");
+	i = 0;
+	while(sp1.path[i]!=-1)
+		printf("%s\n", searchNodes(sp1.path[i++], nodeList)->name);
+
+	printf("\n");
+
+	printf("Shortest Distance from Player 2's Starting Point (%s) to Destination (%s): %d units.\n", searchNodes(startpoint2, nodeList)->name, searchNodes(destPoint, nodeList)->name, sp2.distance);
+	printf("Shortest Path: \n");
+	i = 0;
+	while(sp2.path[i]!=-1)
+		printf("%s\n", searchNodes(sp2.path[i++], nodeList)->name);
+
+	OS_PAUSE();
+
+	// Finish Up
 	
 	free(p1);
 	free(p2);
+	return winner;
 }
 
 /* HEADER MAIN */
@@ -1300,24 +1345,33 @@ int shortestPath() {
 	spNode SPNodes[MAX_MUNICIPAL][MAX_CITIES];
 	spPath SPPaths[MAX_PATH];
 	setShortestPathNodes(SPNodes);
-	setShortestPathPaths(SPPaths, 1, 999);
 
-	/* COMMENTING THE WHOLE MAIN OUT FOR TESTING PURPOSES FOR DIJKSTRA'S ALGORITHM
 	// Variable Declarations
 	char cChoice;
+	int nChoice;
+	int isValid = 0;
+	int winner = 0;
+	int openGrid = 1;
+	spDijkstra sp1, sp2;
+
 	do {
 		// Display game rules & mechanics
 		//OS_CLEAR();
 		printf("Note: To see the entire map, please keep the terminal window in its biggest possible size.\n"
 			   "===========================================================================================\n"
 			   "\nGAME MECHANICS:\n"
-			   "\nThis game is about speed and smarts.\n"
-			   "1. Both players shall pick their starting points.\n"
-			   "\t- Starting points must be in the first city.\n"
+			   "\nThis game is about awareness and determination.\n"
+			   "1. Both players shall pick their own starting points.\n"
+			   "\t- Starting points must be in the first city (Topmost row - Muntinlupa).\n"
 			   "2. Both players will have the same destination point.\n"
-			   "\t- Destination point must be in the last city, to be chosen by the players.\n"
-			   "3. Players cannot be on the same place at the same time.\n"
-			   "4. Whoever reaches the destination point with the least distance traveled wins the game.\n"
+			   "\t- Destination point must be in the last city (Caloocan), to be chosen by the first player.\n"
+			   "3. Whoever reaches the destination point with the least distance traveled wins the game.\n"
+			   "-------------------------------------------------------------------------------------------\n"
+			   "After the game, the shortest path for both players will be displayed.\n"
+			   "[IMPORTANT] PLEASE NOTE: Due to limited display space on the console screen, a text file of the playing grid\n"
+			   "				will be generated each round. This grid is then automatically opened by the program.\n"
+			   "				It is then recommended that you close the grid every turn, to avoid flooding of\n"
+			   "				notepad/text editors (SUPPORTED ONLY IN WINDOWS OPERATING SYSTEMS).\n"
 			   "\n"
 			   "Note: Distances are randomized every game.\n"
 			   "Ready to play? [Y/n]: ");
@@ -1328,9 +1382,33 @@ int shortestPath() {
 		return 0;
 	
 	printf("Once again, please set the window to the maximum size. If you haven't yet, do so now.\n");
-	OS_PAUSE();
-	
-	spGameplay(SPNodes, SPPaths);
-	*/
+	#if _WIN32 || _WIN64
+	printf("Do you want to automatically open the grid file with you text editor every move? [Y/n]: ");
+	scanf(" %c", &cChoice);
+	switch(cChoice) {
+		case 'N': case 'n':
+			openGrid = 0;
+	}
+	#else
+	int openGrid = 0;
+	#endif
+	printf("Please enter maximum distance per path/edge [any integer > 1]: ");
+	isValid = spSafeIntInput(&nChoice);
+	if(isValid && nChoice > 1 && nChoice < INT_MAX) {
+		setShortestPathPaths(SPPaths, 1, nChoice);
+		// Do the gameplay
+		winner = spGameplay(SPNodes, SPPaths, openGrid);
+		OS_CLEAR();
+		switch(winner) {
+			case 0: return 0;
+			case 1: return 1;
+			case 2: return 2;
+		}
+	}
+	else {
+		printf("Invalid maximum distance input. Input must be an integer greater than 1, less than 2^31.\n");
+		OS_PAUSE();
+	}
+
 	return 0;
 }
