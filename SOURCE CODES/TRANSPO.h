@@ -98,6 +98,18 @@ void generateSupply_Demand(int supply[3], int demand[3]){
 	generateThree(demand, sum_stocks);			// 3. Do the same for demand
 
 }
+
+/*
+	1. Checks if there exists same quantity for row n and column n
+*/
+int checkDegenerate(int ogSupply[3], int ogDemand[3]){
+	int i, degenerate = 0;
+	for (i=0; i<3 && !degenerate; i++)
+		if (ogSupply[i] == ogDemand[i])
+			degenerate = 1;
+
+	return degenerate;
+}
 // ======================= END OF RNG FUNCTIONS ========================
 
 //==============================DISPLAY FUNCTIONS====================================
@@ -202,13 +214,14 @@ void displayTable(int supply[], int demand[], Detail details[][3], String28 labe
 }
 
 // ========================== END OF DISPLAY FUNCTIONS ===============================
-void initializePlayers(Detail details[3][3], Detail player1[3][3], Detail player2[3][3]){
+void initializePlayers(Detail details[3][3], Detail player1[3][3], Detail player2[3][3], Detail best[3][3]){
 	int row, col;
 	for (row=0; row<3; row++){
 		for (col=0; col<3; col++){
 			details[row][col].quantity = 0;
 			player1[row][col] = details[row][col];
 			player2[row][col] = details[row][col];
+			best[row][col] = details[row][col];
 		}
 	}
 }
@@ -368,17 +381,7 @@ void nwCornerRule(Detail best[3][3], int supply[3], int demand[3]){
 		}
 	}
 }
-/*
-	1. Checks if there exists same quantity for row n and column n
-*/
-int checkDegenerate(int ogSupply[3], int ogDemand[3]){
-	int i, degenerate = 0;
-	for (i=0; i<3 && !degenerate; i++)
-		if (ogSupply[i] == ogDemand[i])
-			degenerate = 1;
 
-	return degenerate;
-}
 /* HEADER MAIN FUNCTION */
 int transpoProblem() {
 	// ================== Variable Declarations =================
@@ -388,6 +391,7 @@ int transpoProblem() {
   	Detail details[3][3], player1[3][3], player2[3][3], best[3][3];
   	int ogSupply[3], int ogDemand[3], supply[3], demand[3], degenerate;
 	int sum_stocks, nOption, over = 0, pos;
+	float total1, total2, bestTotal;
 	char cOption;
 	time_t t;
   	// ================== End of Variable Declarations ============
