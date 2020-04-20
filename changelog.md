@@ -1,4 +1,4 @@
-# CHANGELOG [Last Updated - 04/15/2020]
+# CHANGELOG [Last Updated - 04/21/2020]
 Please write all changes here. Follow the format.
 
 - [Adi - 03/15/2020] GitHub repository and skeleton file created.
