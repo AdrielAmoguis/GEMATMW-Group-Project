@@ -991,6 +991,7 @@ int decideWinner(spMove p1[], spMove p2[]) {
 /* Recursive function that processes the return value for Dijkstra's Algorithm.
 */
 void processPath(int parent[], int pathArr[] ,int x) {
+	int uselessVar = 0;
 	// Recursive Funciton
 	// Base Case : X is source
 	if(parent[x] == -1)
@@ -1112,7 +1113,6 @@ spDijkstra dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES],
 		moveset.path[i] = -1;
 	// Call recursive function
 	processPath(parent, moveset.path, endpoint);
-
 	return moveset;
 }
 
@@ -1342,6 +1342,7 @@ int spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGrid) {
 	printf("Player 2 travled a total distance of: %d units.\n", p2[nMove-1].totalDistance);
 
 	// DISPLAY SHORTEST PATH SOLUTIONS FOR BOTH PLAYERS
+	printf("Calculating Shortest Routes using Dijkstra's Algorithm:\n\n");
 
 	spDijkstra sp1, sp2;
 	sp1 = dijkstra(startpoint1, destPoint, nodeList, pathList);
