@@ -10,6 +10,7 @@
 		- DisplayGrid has been implemented.
 		- Dijkstra's Function has been implemented.
 		- Finished the actual SP module
+		- Memory Optimization Complete
 		- Debugging:
 			+ Issue found: There are cases where players' distance < spDistance
 							This is a major flaw. It implies that the Dijkstra's algorithm does not work.
@@ -88,7 +89,7 @@ int getRandInt(int seed, int min, int max) {
 	Stores the input in the address of param1.
 	Returns 0 when invalid, 1 when valid. */
 int spSafeIntInput(int *x) {
-	char buffer[50];
+	char buffer[15];
 	int i, size;
 	
 	scanf("%s", buffer);
@@ -135,7 +136,7 @@ void intAppendArr(int arr[], int key) {
 int getArrMin(int arr[], int dist[]) {
 	int minIndex;
 	int min = INT_MAX;
-	int i, j;
+	int i;
 
 	for(i = 0; i < MAX_NODES; i++)
 		if(arr[i] < min && dist[i]==0) {
@@ -586,7 +587,7 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGri
 	*/
 
 	// Variable Declarations
-	char finalDisplay[20000] = "";
+	char finalDisplay[13255] = "";
 	int nodeI = 4;
 	int nodeJ = 0;
 	int pathI = 33, pathI2 = 24, pathI3 = 76;
@@ -642,6 +643,9 @@ void displaySPGrid(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGri
 		if(i%2==0)
 			nodeJ++;
 	}
+
+	// Add Last Nullbyte
+	strcat(finalDisplay, "\0");
 
 	// Finally, print the finished grid
 	printf("%s\n", finalDisplay);
@@ -1089,7 +1093,7 @@ spDijkstra dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES],
 */
 int spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGrid) {
 	// Declare and initialize applicable lists
-	int initialMovesetSize = 200;
+	int initialMovesetSize = 70;
 	struct spMoveTag *p1 = (struct spMoveTag *) malloc(sizeof(struct spMoveTag)*initialMovesetSize);
 	struct spMoveTag *p2 = (struct spMoveTag *) malloc(sizeof(struct spMoveTag)*initialMovesetSize);
 
@@ -1352,7 +1356,6 @@ int shortestPath() {
 	int isValid = 0;
 	int winner = 0;
 	int openGrid = 1;
-	spDijkstra sp1, sp2;
 
 	do {
 		// Display game rules & mechanics
