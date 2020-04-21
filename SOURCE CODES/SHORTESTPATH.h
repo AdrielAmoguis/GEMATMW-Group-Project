@@ -23,6 +23,7 @@
 #include <string.h>
 #include <time.h>
 #include <limits.h>
+#include <stdint.h>
 
 // DETERMINE OPERATING SYSTEM
 #if _WIN32 || _WIN64
@@ -67,21 +68,34 @@ typedef struct spDijkstraTag {
 	int path[MAX_NODES];
 } spDijkstra;
 
+typedef struct { uint64_t state;  uint64_t inc; } pcg32_random_t;
+
 // User-Defined Functions
 
 // SECONDARY FUNCTIONS
+
+/*	This function is an imported function: https://www.pcg-random.org/download.html
+	This is a way better RNG than C's stock RNG which just sucks.
+*/
+uint32_t pcg32_random_r(pcg32_random_t* rng) {
+// *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
+// Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
+    uint64_t oldstate = rng->state;
+    // Advance internal state
+    rng->state = oldstate * 6364136223846793005ULL + (rng->inc|1);
+    // Calculate output function (XSH RR), uses old state for max ILP
+    uint32_t xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+    uint32_t rot = oldstate >> 59u;
+    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+}
+
 /* This function generates a random integer between min and max inclusive
 	and returns its value.
 */
-int getRandInt(int seed, int min, int max) {
-	time_t t;
-	// Seed the rand()
-	if(seed==0)
-		srand((unsigned) time(&t));
-	else 
-		srand(seed);
+int getRandInt(int min, int max) {
+	pcg32_random_t y;
 	int x = min;
-	x += rand() % (max-min);
+	x += pcg32_random_r(&y) % (max-min);
 	return x;
 }
 
@@ -273,7 +287,7 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	int index;
 	
 	// Initialize horizontal first element
-	pathList[0].distance = getRandInt(0, min, max);
+	pathList[0].distance = getRandInt(min, max);
 	pathList[0].node1 = 0;
 	pathList[0].node2 = 1;	
 	
@@ -284,12 +298,12 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 			index = (i*(MAX_CITIES-1))+j;
 			if(index != 0) {
 				if(j!=0) {
-					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+					pathList[index].distance = getRandInt(min, max);
 					pathList[index].node1 = pathList[index-1].node2;
 					pathList[index].node2 = pathList[index].node1 + 1;
 				}
 				else {
-					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+					pathList[index].distance = getRandInt(min, max);
 					pathList[index].node1 = pathList[index-1].node2 + 1;
 					pathList[index].node2 = pathList[index].node1 + 1;
 				}
@@ -299,7 +313,7 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	}
 	index++;
 	// Initialize Vertical first element
-	pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+	pathList[index].distance = getRandInt(min, max);
 	pathList[index].node1 = 0;
 	pathList[index].node2 = 7;
 	k = index;
@@ -310,12 +324,12 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 			index = k + j+(i*(MAX_MUNICIPAL-1));
 			if(index != k) {
 				if(j!=0) {
-					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+					pathList[index].distance = getRandInt(min, max);
 					pathList[index].node1 = pathList[index-1].node2;
 					pathList[index].node2 = pathList[index].node1 + 7;
 				}
 				else {
-					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+					pathList[index].distance = getRandInt(min, max);
 					pathList[index].node1 = i;
 					pathList[index].node2 = pathList[index].node1 + 7;
 				}
@@ -325,7 +339,7 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	
 	index++;
 	// Initialize Falling-Diagonal first element
-	pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+	pathList[index].distance = getRandInt(min, max);
 	pathList[index].node1 = 0;
 	pathList[index].node2 = 8;
 	k = index;
@@ -336,12 +350,12 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 			index = k + (i*(MAX_CITIES-1))+j;
 			if(index != k) {
 				if(j!=0) {
-					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+					pathList[index].distance = getRandInt(min, max);
 					pathList[index].node1 = pathList[index-1].node1 + 1;
 					pathList[index].node2 = pathList[index-1].node2 + 1;
 				}
 				else {
-					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+					pathList[index].distance = getRandInt(min, max);
 					pathList[index].node1 = i*7;
 					pathList[index].node2 = pathList[index].node1 + 8;
 				}
@@ -351,7 +365,7 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 	
 	index++;
 	// Initialize Rising-Diagonal first element
-	pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+	pathList[index].distance = getRandInt(min, max);
 	pathList[index].node1 = 1;
 	pathList[index].node2 = 7;
 	k = index;
@@ -362,12 +376,12 @@ void setShortestPathPaths(spPath pathList[], int min, int max) {
 			index = k + (i*(MAX_CITIES-1))+j;
 			if(index != k) {
 				if(j!=0) {
-					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+					pathList[index].distance = getRandInt(min, max);
 					pathList[index].node1 = pathList[index-1].node1 + 1;
 					pathList[index].node2 = pathList[index-1].node2 + 1;
 				}
 				else {
-					pathList[index].distance = getRandInt(pathList[index-1].distance, min, max);
+					pathList[index].distance = getRandInt(min, max);
 					pathList[index].node1 = (i*7)+1;
 					pathList[index].node2 = pathList[index].node1 + 6;
 				}
@@ -1395,7 +1409,7 @@ int shortestPath() {
 	#else
 	int openGrid = 0;
 	#endif
-	printf("Please enter maximum distance per path/edge [any integer > 1]: ");
+	printf("Please enter maximum distance per path/edge [any integer > 50]: ");
 	isValid = spSafeIntInput(&nChoice);
 	if(isValid && nChoice > 1 && nChoice < INT_MAX) {
 		setShortestPathPaths(SPPaths, 1, nChoice);
