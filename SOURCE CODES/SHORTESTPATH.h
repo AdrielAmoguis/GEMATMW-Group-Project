@@ -70,6 +70,7 @@ typedef struct spDijkstraTag {
 
 typedef struct { uint64_t state;  uint64_t inc; } pcg32_random_t;
 
+
 // User-Defined Functions
 
 // SECONDARY FUNCTIONS
@@ -93,9 +94,22 @@ uint32_t pcg32_random_r(pcg32_random_t* rng) {
 	and returns its value.
 */
 int getRandInt(int min, int max) {
-	pcg32_random_t y;
+	// Open randomizerState binary file
+	pcg32_random_t randomizerSeed;
+	FILE *randFp = fopen("randomizer.state", "rb");
+	if(randFp != NULL) {
+		fread(&randomizerSeed, sizeof(pcg32_random_t), 1, randFp);
+		fclose(randFp);
+	}
+
 	int x = min;
-	x += pcg32_random_r(&y) % (max-min);
+	x += pcg32_random_r(&randomizerSeed) % (max-min);
+
+	// Save randomizerState binary file
+	randFp = fopen("randomizer.state", "wb");
+	fwrite(&randomizerSeed, sizeof(pcg32_random_t), 1, randFp);
+	fclose(randFp);
+
 	return x;
 }
 
@@ -1409,9 +1423,9 @@ int shortestPath() {
 	#else
 	int openGrid = 0;
 	#endif
-	printf("Please enter maximum distance per path/edge [any integer > 50]: ");
+	printf("Please enter maximum distance per path/edge [any integer >= 10]: ");
 	isValid = spSafeIntInput(&nChoice);
-	if(isValid && nChoice > 1 && nChoice < INT_MAX) {
+	if(isValid && nChoice >= 10 && nChoice < INT_MAX) {
 		setShortestPathPaths(SPPaths, 1, nChoice);
 		// Do the gameplay
 		winner = spGameplay(SPNodes, SPPaths, openGrid);
@@ -1423,7 +1437,7 @@ int shortestPath() {
 		}
 	}
 	else {
-		printf("Invalid maximum distance input. Input must be an integer greater than 1, less than 2^31.\n");
+		printf("Invalid maximum distance input. Input must be an integer greater than or equal to 10, less than 2^31.\n");
 		OS_PAUSE();
 	}
 
