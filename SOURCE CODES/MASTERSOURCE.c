@@ -59,7 +59,17 @@ int safeIntInput(int *x) {
 /* *** MAIN FUNCTION ***/
 int main() {
 	// Variable Declarations
-	int nChoice, doExit = 0;
+	int nChoice;
+	char cChoice;
+	int over = 0;
+	// Target # of points to win
+	const int targetPoints = 20;
+	// Point Values for Each Game
+	const int pointsSP = 4;
+	const int pointsTP = 2;
+	// Players' Points Variables
+	int player1 = 0;
+	int player2 = 0;
 	
 	// MAIN MENU
 	printf("DE LA SALLE UNIVERSITY\n"
@@ -69,42 +79,129 @@ int main() {
 		   "\nSUBMITTED TO: DR. APRIL SAY-AWEN\n"
 		   "\nDEVELOPED BY:\n"
 		   "ADRIEL ISAIAH V. AMOGUIS\n"
-		   "BENEDICT SUN\n"
+		   "BENEDICT C. SUN\n"
 		   "GIANCARLO T. TEE\n"
-		   "KYLE FRANCIS LIM\n"
+		   "KYLE FRANCIS Y. LIM\n"
 		   "======================================\n");
 	OS_PAUSE();
 	OS_CLEAR();
 	
+	// Display Game Mechanics
+	printf("WELCOME TO ADI'S MINIGAMES!\n"
+		   "Game Mechanics:\n"
+		   "1. This is a two player sequential game.\n"
+		   "2. It's a race to %d points. The first to reach it wins the game.\n"
+		   "3. Think of strategies to choose which games to play and in what order.\n", targetPoints);
+	OS_PAUSE();
+	OS_CLEAR();
+
 	do {
+		printf("Target Number of Points to Win: %d\n", targetPoints);
+		printf("Player 1: %d Points\n", player1);
+		printf("Player 2: %d Points\n\n", player2);
 		printf("ADI'S MINIGAMES - Choose One:\n"
-		       "1. Lakwatsa sa Maynila!\n" // Definitely need a better title. HAHAHAHAHAHA
-			   "2. Transportation Problem\n"
-			   "3. Exit Program\n");
+		       "1. Lakwatsa sa Maynila! 	[%d Points]\n" // Definitely need a better title. HAHAHAHAHAHA
+			   "2. Shoppe?				 	[%d Points]\n"
+			   "3. Exit Program\n", pointsSP, pointsTP);
 		printf("Your Choice: ");
 		if(safeIntInput(&nChoice)) {
 			switch(nChoice) {
 				case 1:
-					shortestPath();
-					OS_PAUSE();
+					switch(shortestPath()) {
+						case 0: // Tie
+							player1 += pointsSP/2;
+							player2 += pointsSP/2;
+							printf("%d points awarded to both players.\n", pointsSP/2);
+							OS_PAUSE();
+							break;
+						case 1: // Player 1
+							player1 += pointsSP;
+							printf("%d points awarded to player 1.\n", pointsSP);
+							OS_PAUSE();
+							break;
+						case 2: // Player 2
+							player2 += pointsSP;
+							printf("%d points awarded to player 2.\n", pointsSP);
+							OS_PAUSE();
+							break;
+					}
 					break;
 				case 2:
-					transpoProblem();
-					OS_PAUSE();
+					switch(transpoProblem()) {
+						case 0: // Tie
+							player1 += pointsTP/2;
+							player2 += pointsTP/2;
+							printf("%d points awarded to both players.\n", pointsTP/2);
+							OS_PAUSE();
+							break;
+						case 1: // Player 1
+							player1 += pointsTP;
+							printf("%d points awarded to player 1.\n", pointsTP);
+							OS_PAUSE();
+							break;
+						case 2: // Player 2
+							player2 += pointsTP;
+							printf("%d points awarded to player 2.\n", pointsTP);
+							OS_PAUSE();
+							break;
+					}
 					break;
 				case 3:
-					doExit = 1;
+					// Ask for confirmation before exit
+					OS_CLEAR();
+					printf("Are you sure you want to exit?\nAll progress will be lost: [y/N]: ");
+					scanf(" %c", &cChoice);
+					if(cChoice == 'Y' || cChoice == 'y')
+						return 0;
 					break;
 				default:
 					printf("Invalid Input!\n");
+			}
+
+			// Check for game winner
+			if(player1 >= targetPoints && player2 >= targetPoints && player1 == player2) {
+				// Tie
+				OS_CLEAR();
+				printf("GAME OVER!\n"
+					   "The game is tied and both have reached the required score.\n"
+					   "It's a tie!\n"
+					   "\nTied Score: %d\n\n", player1);
+				over = 1;
+				OS_PAUSE();
+			}
+			else if(player1 >= targetPoints) {
+				// Player 1 Wins
+				OS_CLEAR();
+				printf("GAME OVER!\n"
+					   "Player one has reached over the score to beat!\n"
+					   "Player 1 wins and takes the gold!\n"
+					   "\nPlayer 1 Score: %d\nPlayer 2 Score: %d\n\n", player1, player2);
+				over = 1;
+				OS_PAUSE();
+			}
+			else if(player2 >= targetPoints) {
+				// Player 2 Wins
+				OS_CLEAR();
+				printf("GAME OVER!\n"
+					   "Player two has reached over the score to beat!\n"
+					   "Player 2 wins and brings back the juicy bacon!\n"
+					   "\nPlayer 1 Score: %d\nPlayer 2 Score: %d\n\n", player1, player2);
+				over = 1;
+				OS_PAUSE();
+			}
+
+			// Check if Game over
+			if(over) {
+				printf("Thanks for playing, really! :>\n");
+				printf("Have a nice day!");
+				return 0;
 			}
 		}
 		else 
 			printf("Invalid Input! Input must be an integer.\n");
 		
 		OS_CLEAR();
-	} while(!doExit);
+	} while(1);
 	
 	return 0;
 }
-

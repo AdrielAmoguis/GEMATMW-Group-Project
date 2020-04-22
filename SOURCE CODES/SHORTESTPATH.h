@@ -1,6 +1,10 @@
 /*
 	GEMATMW PROJECT
 	SHORTEST PATH MODULE
+
+	DEVELOPED BY:
+		- Adriel Isaiah V. Amoguis
+		- Kyle Francis Y. Lim
 	
 	DEVELOPMENT NOTES [Last updated: 2:16 AM - 04/21/2020]:
 		- Node structure systems have been implemented.
@@ -1444,9 +1448,9 @@ int shortestPath() {
 		winner = spGameplay(SPNodes, SPPaths, openGrid);
 		OS_CLEAR();
 		switch(winner) {
-			case 0: return 0;
-			case 1: return 1;
-			case 2: return 2;
+			case 0: return 0; // Tie
+			case 1: return 1; // Player 1
+			case 2: return 2; // Player 2
 		}
 	}
 	else {
@@ -1454,5 +1458,5 @@ int shortestPath() {
 		OS_PAUSE();
 	}
 
-	return 0;
+	return -1;
 }

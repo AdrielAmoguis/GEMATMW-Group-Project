@@ -1,6 +1,11 @@
 /*
 	GEMATMW PROJECT
 	TRANSPORTATION PROBLEM MODULE
+
+	DEVELOPED BY:
+		- Giancarlo T. Tee
+		- Benedict C. Sun
+
 */
 // Library Imports
 #include <stdio.h>
@@ -1096,5 +1101,5 @@ int transpoProblem(void) {
 		else
 			return 2;
 	}
-  return 0;
+  return -1;
 }
