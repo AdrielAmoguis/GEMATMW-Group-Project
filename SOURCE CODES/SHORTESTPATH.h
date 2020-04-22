@@ -1417,7 +1417,7 @@ int shortestPath() {
 			   "-------------------------------------------------------------------------------------------\n"
 			   "After the game, the shortest path for both players will be displayed.\n"
 			   "[IMPORTANT] PLEASE NOTE: Due to limited display space on the console screen, a text file of the playing grid\n"
-			   "				will be generated each round. This grid is then automatically opened by the program.\n"
+			   "				will be generated each round. This grid is then automatically opened by the program when turned on.\n"
 			   "				It is then recommended that you close the grid every turn, to avoid flooding of\n"
 			   "				notepad/text editors (SUPPORTED ONLY IN WINDOWS OPERATING SYSTEMS).\n"
 			   "\n"
@@ -1438,7 +1438,7 @@ int shortestPath() {
 			openGrid = 0;
 	}
 	#else
-	int openGrid = 0;
+	openGrid = 0;
 	#endif
 	printf("Please enter maximum distance per path/edge [any integer >= 10, < 1000]: ");
 	isValid = spSafeIntInput(&nChoice);
