@@ -11,10 +11,7 @@
 		- Dijkstra's Function has been implemented.
 		- Finished the actual SP module
 		- Memory Optimization Complete
-		- Debugging:
-			+ Issue found: There are cases where players' distance < spDistance
-							This is a major flaw. It implies that the Dijkstra's algorithm does not work.
-							Review the Dijkstra's algo.
+		
 */
 
 // Library Imports
@@ -79,8 +76,8 @@ typedef struct { uint64_t state;  uint64_t inc; } pcg32_random_t;
 	This is a way better RNG than C's stock RNG which just sucks.
 */
 uint32_t pcg32_random_r(pcg32_random_t* rng) {
-// *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
-// Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
+	// *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
+	// Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
     uint64_t oldstate = rng->state;
     // Advance internal state
     rng->state = oldstate * 6364136223846793005ULL + (rng->inc|1);
@@ -1298,9 +1295,11 @@ int spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGrid) {
 			OS_PAUSE();
 		}
 			
-		else 
+		else {
 			// End Game
 			over = 1;
+		}
+			
 
 	} while(!over);
 
@@ -1308,30 +1307,36 @@ int spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGrid) {
 	OS_CLEAR();
 	switch(decideWinner(p1,p2)) {
 		case 0:
-			printf("It's a draw! Congratulations to both players!\n");
+			printf("========================================================================\n");
+			printf("---===[It's a draw! Congratulations to both players!]===---\n");
 			winner = 0;
 			break;
 		case 1:
-			printf("Player 1 wins the game!\n");
+			printf("========================================================================\n");
+			printf("\n\n\n---===[Player 1 wins the game!]===---\n");
 			winner = 1;
 			break;
-		case 2:
-			printf("Player 2 wins the game!\n");
+		case 2:	
+			printf("========================================================================\n");
+			printf("\n\n\n---===[Player 2 wins the game!]===---\n");
 			winner = 2;
 	}	
 
+	OS_PAUSE();
 	// Display Game Statistics
 
-	printf("Player 1 took the path: \n");
+	printf("Player 1 took the path: \n\n");
 	i = 0;
 	while(p1[i].distance != -1) {
 		printf("%s\n", searchNodes(p1[i++].newNode, nodeList)->name);
 	}
 	int nMove = i - 1;
 	
-	printf("Player 1 travled a total distance of: %d units.\n\n", p1[nMove-1].totalDistance);
+	printf("\nPlayer 1 travled a total distance of: %d units.\n\n", p1[nMove].totalDistance);
 
-	printf("Player 2 took the path: \n");
+	OS_PAUSE();
+
+	printf("Player 2 took the path: \n\n");
 
 	i = 0;
 	while(p2[i].distance != -1) {
@@ -1339,25 +1344,32 @@ int spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGrid) {
 	}
 	nMove = i - 1;
 
-	printf("Player 2 travled a total distance of: %d units.\n", p2[nMove-1].totalDistance);
+	printf("\nPlayer 2 travled a total distance of: %d units.\n", p2[nMove].totalDistance);
+
+	OS_PAUSE();
 
 	// DISPLAY SHORTEST PATH SOLUTIONS FOR BOTH PLAYERS
-	printf("Calculating Shortest Routes using Dijkstra's Algorithm:\n\n");
+	printf("\n==================================================================\nCalculating Shortest Routes using Dijkstra's Algorithm:\n\n");
 
 	spDijkstra sp1, sp2;
 	sp1 = dijkstra(startpoint1, destPoint, nodeList, pathList);
 	sp2 = dijkstra(startpoint2, destPoint, nodeList, pathList);
 
 	printf("Shortest Distance from Player 1's Starting Point (%s) to Destination (%s): %d units.\n", searchNodes(startpoint1, nodeList)->name, searchNodes(destPoint, nodeList)->name, sp1.distance);
-	printf("Shortest Path: \n");
+	printf("Shortest Path: \n\n");
+
+	printf("%s\n", searchNodes(startpoint1, nodeList)->name);
 	i = 0;
 	while(sp1.path[i]!=-1)
 		printf("%s\n", searchNodes(sp1.path[i++], nodeList)->name);
 
+	OS_PAUSE();
 	printf("\n");
 
-	printf("Shortest Distance from Player 2's Starting Point (%s) to Destination (%s): %d units.\n", searchNodes(startpoint2, nodeList)->name, searchNodes(destPoint, nodeList)->name, sp2.distance);
-	printf("Shortest Path: \n");
+	printf("\nShortest Distance from Player 2's Starting Point (%s) to Destination (%s): %d units.\n", searchNodes(startpoint2, nodeList)->name, searchNodes(destPoint, nodeList)->name, sp2.distance);
+	printf("Shortest Path: \n\n");
+
+	printf("%s\n", searchNodes(startpoint2, nodeList)->name);
 	i = 0;
 	while(sp2.path[i]!=-1)
 		printf("%s\n", searchNodes(sp2.path[i++], nodeList)->name);
@@ -1411,7 +1423,7 @@ int shortestPath() {
 	} while(cChoice!='Y' && cChoice!='y' && cChoice!='N' && cChoice!='n');
 	
 	if(cChoice=='N' || cChoice=='n')
-		return 0;
+		return -1;
 	
 	printf("Once again, please set the window to the maximum size. If you haven't yet, do so now.\n");
 	#if _WIN32 || _WIN64
@@ -1424,9 +1436,9 @@ int shortestPath() {
 	#else
 	int openGrid = 0;
 	#endif
-	printf("Please enter maximum distance per path/edge [any integer >= 10]: ");
+	printf("Please enter maximum distance per path/edge [any integer >= 10, < 1000]: ");
 	isValid = spSafeIntInput(&nChoice);
-	if(isValid && nChoice >= 10 && nChoice < INT_MAX) {
+	if(isValid && nChoice >= 10 && nChoice < 1000) {
 		setShortestPathPaths(SPPaths, 1, nChoice);
 		// Do the gameplay
 		winner = spGameplay(SPNodes, SPPaths, openGrid);
@@ -1438,7 +1450,7 @@ int shortestPath() {
 		}
 	}
 	else {
-		printf("Invalid maximum distance input. Input must be an integer greater than or equal to 10, less than 2^31.\n");
+		printf("Invalid maximum distance input. Input must be an integer greater than or equal to 10, less than 1000.\n");
 		OS_PAUSE();
 	}
 
