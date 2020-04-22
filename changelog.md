@@ -1,4 +1,4 @@
-# CHANGELOG [Last Updated - 04/21/2020]
+# CHANGELOG [Last Updated - 04/23/2020]
 Please write all changes here. Follow the format.
 
 - [Adi - 03/15/2020] GitHub repository and skeleton file created.
@@ -12,3 +12,4 @@ Please write all changes here. Follow the format.
 - [Adi - 04/15/2020] Appended Kyle's trivia function.
 - [Adi - 04/15/2020] Completed the entire gameplay system for shortest path.
 - [Adi - 04/21/2020] Completed the Shortest Path module. Requires debugging. See commit notes.
+- [Adi - 04/23/2020] Unless there are findings during the debugging stage, finalized all source code.
