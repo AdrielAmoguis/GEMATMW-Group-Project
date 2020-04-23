@@ -100,8 +100,8 @@ int main() {
 		printf("Player 1: %d Points\n", player1);
 		printf("Player 2: %d Points\n\n", player2);
 		printf("ADI'S MINIGAMES - Choose One:\n"
-		       "1. Lakwatsa sa Maynila! 	[%d Points]\n" // Definitely need a better title. HAHAHAHAHAHA
-			   "2. Shoppe?				 	[%d Points]\n"
+		       "1. Lakwatsa sa Maynila!		[%d Points]\n" // Definitely need a better title. HAHAHAHAHAHA
+			   "2. Shoppe?			[%d Points]\n"
 			   "3. Exit Program\n", pointsSP, pointsTP);
 		printf("Your Choice: ");
 		if(safeIntInput(&nChoice)) {
