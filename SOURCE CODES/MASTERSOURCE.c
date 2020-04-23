@@ -127,6 +127,7 @@ int main() {
 					}
 					break;
 				case 2:
+					OS_CLEAR();
 					switch(transpoProblem()) {
 						case 0: // Tie
 							player1 += pointsTP/2;

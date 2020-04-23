@@ -434,14 +434,12 @@ void initPathresult(pathinfo Pathresult[]){
 void adjustTable(pathinfo Pathresult, Detail Best[][3]){
 	int i, h;
 	int quantity=-1000;
-	float quantityprice=0;
 	//Finds the lowest quantity among the ones that you subtracted price in the initial stepping stone. (the ones below 0 in this case)
 	for(i=0;i<3;i++){
 		for(h=0;h<3;h++){
 			if (Pathresult.Pathing[i][h]<0){
 				if(quantity<Best[i][h].quantity*-1){
 					quantity=Best[i][h].quantity*-1;
-					quantityprice=Best[i][h].price;
 				}
 			}
 		}
@@ -829,7 +827,7 @@ void CreateLoop(int nRow, int nCol, Detail Best[][3], int Path[][3]){
 						moved=1;
 					}
 					else if(vert==-1){
-						if(Best[i+2][h].quantity!=0 && Path[i+2][h]==0 || i+2==nRow && h==nCol){
+						if((Best[i+2][h].quantity!=0 && Path[i+2][h]==0) || (i+2==nRow && h==nCol)){
 							if(nextDest(Best, i+2, h, 0, Path, nRow, nCol, pNum)){
 								i+=2;
 								moved=1;
@@ -972,11 +970,10 @@ int transpoProblem(void) {
   // ================== Variable Declarations =================
   //Gian's Variables
   String28 labels[6]={"LUZON","VISAYAS", "MINDANAO", "DHL AIRMAIL", "LBC LAND" , "PARCEL SHIPPING"};
-  	int isOptimal;
  //Ben's variables
   	Detail details[3][3], player1[3][3], player2[3][3], best[3][3];
   	int ogSupply[3], ogDemand[3], supply[3], demand[3], degenerate;
-	int sum_stocks, nOption, over = 0, pos, gameResult;
+	int nOption, over = 0, pos, gameResult;
 	float total1, total2, bestTotal;
 	char cOption;
 	time_t t;

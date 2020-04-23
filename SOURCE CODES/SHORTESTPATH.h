@@ -945,6 +945,7 @@ const char * trivia(char pPlaces[]){
 	else if  (strcmp(pPlaces,"LRT Caloocan Mall")==0) {
 		return  "It is a home to hundred of stores and outlets that offer a variety of products and services. It is located along Rizal Avenue Extension. The mall entrance is directly adjacent to LRT Monumento Station.";
 	}
+	return "NULL";
 
 }
 
@@ -993,6 +994,7 @@ int decideWinner(spMove p1[], spMove p2[]) {
 */
 void processPath(int parent[], int pathArr[] ,int x) {
 	int uselessVar = 0;
+	uselessVar = 2*uselessVar;
 	// Recursive Funciton
 	// Base Case : X is source
 	if(parent[x] == -1)
@@ -1005,20 +1007,16 @@ void processPath(int parent[], int pathArr[] ,int x) {
 
 /*	This function calculates and returns the shortest route to get from startpoint to endpoint.
 */
-spDijkstra dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES], spPath pathList[]) {
+spDijkstra dijkstra(int startpoint, int endpoint, spPath pathList[]) {
 	// Declare the return moveset - assume it will be freed by caller
 	spDijkstra moveset;
 
 	// Variable Declarations
 	const int infinity = INT_MAX;
-	int i, j, k, l;
-	int availPaths[8];
-	int found;
-	int min = infinity;
+	int i, j, l;
 	int visited[35];
 	int distance[35];
 	int u, v;
-	int nMove = 0;
 	int parent[MAX_NODES];
 
 	// Generate the Graph in the orientation of the gameplay
@@ -1037,18 +1035,16 @@ spDijkstra dijkstra(int startpoint, int endpoint, spNode nodeList[][MAX_CITIES],
 		for(j = 0; j < MAX_NODES; j++) {
 			// So in this sense, node1 = i; node2 = j.
 			// We need to search for paths that connect node1 and node2.
-			// The distance that this path is carrying will then be used to populate \
-				that specific cell in the costMatrix.
+			// The distance that this path is carrying will then be used to populate
+			//	that specific cell in the costMatrix.
 			// Task 1.1: Search for paths that connect node1 and node2.
 			// Task 1.1.1: Commence the search.
 			// Base case: startpoint
 			if(i == startpoint && j == startpoint)
 				costMatrix[i][j] = 0;
-			found = 0;
 			for(l = 0; l < MAX_PATH; l++) {
 				if((pathList[l].node1 == i && pathList[l].node2 == j) || (pathList[l].node1 == j && pathList[l].node2 == i)) {
 					costMatrix[j][i] = costMatrix[i][j] = pathList[l].distance;
-					found = 1;
 				}
 			}
 		}
@@ -1356,8 +1352,8 @@ int spGameplay(spNode nodeList[][MAX_CITIES], spPath pathList[], int openGrid) {
 	printf("\n==================================================================\nCalculating Shortest Routes using Dijkstra's Algorithm:\n\n");
 
 	spDijkstra sp1, sp2;
-	sp1 = dijkstra(startpoint1, destPoint, nodeList, pathList);
-	sp2 = dijkstra(startpoint2, destPoint, nodeList, pathList);
+	sp1 = dijkstra(startpoint1, destPoint, pathList);
+	sp2 = dijkstra(startpoint2, destPoint, pathList);
 
 	printf("Shortest Distance from Player 1's Starting Point (%s) to Destination (%s): %d units.\n", searchNodes(startpoint1, nodeList)->name, searchNodes(destPoint, nodeList)->name, sp1.distance);
 	printf("Shortest Path: \n\n");
