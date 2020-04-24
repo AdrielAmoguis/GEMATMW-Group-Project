@@ -16,7 +16,7 @@
 
 // SET UNIX-SPECIFIC MACROS
 #define OS_CLEAR() system("clear")
-#define OS_PAUSE() printf("Press any key to continue...\n"); getchar()
+#define OS_PAUSE() fflush(stdin); printf("Press any key to continue...\n"); getchar()
 
 //Typedefs
 typedef char String28[29];
