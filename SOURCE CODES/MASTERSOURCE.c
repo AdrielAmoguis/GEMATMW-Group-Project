@@ -157,6 +157,7 @@ int main() {
 					break;
 				default:
 					printf("Invalid Input!\n");
+					OS_PAUSE();
 			}
 
 			// Check for game winner
@@ -198,9 +199,10 @@ int main() {
 				return 0;
 			}
 		}
-		else 
+		else {
 			printf("Invalid Input! Input must be an integer.\n");
-		
+			OS_PAUSE();
+		}
 		OS_CLEAR();
 	} while(1);
 	
