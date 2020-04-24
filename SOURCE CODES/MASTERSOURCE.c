@@ -171,6 +171,26 @@ int main() {
 				over = 1;
 				OS_PAUSE();
 			}
+			else if(player1 >= targetPoints && player2 >= targetPoints && player1 > player2) {
+				// Player 1 wins
+				OS_CLEAR();
+				printf("GAME OVER!\n"
+					   "Player one has reached over the score to beat!\n"
+					   "Player 1 wins and takes the gold!\n"
+					   "\nPlayer 1 Score: %d\nPlayer 2 Score: %d\n\n", player1, player2);
+				over = 1;
+				OS_PAUSE();
+			}
+			else if(player1 >= targetPoints && player2 >= targetPoints && player1 < player2) {
+				// Player 2 wins
+				OS_CLEAR();
+				printf("GAME OVER!\n"
+					   "Player two has reached over the score to beat!\n"
+					   "Player 2 wins and brings back the juicy bacon!\n"
+					   "\nPlayer 1 Score: %d\nPlayer 2 Score: %d\n\n", player1, player2);
+				over = 1;
+				OS_PAUSE();
+			}
 			else if(player1 >= targetPoints) {
 				// Player 1 Wins
 				OS_CLEAR();
