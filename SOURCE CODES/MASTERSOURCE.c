@@ -36,7 +36,7 @@
 	Stores the input in the address of param1.
 	Returns 0 when invalid, 1 when valid. */
 int safeIntInput(int *x) {
-	char buffer[50];
+	char buffer[15];
 	int i, size;
 	
 	scanf("%s", buffer);
