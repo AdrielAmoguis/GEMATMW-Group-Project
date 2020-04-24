@@ -56,6 +56,27 @@ typedef struct{
 #define MAX_SEED 300
 
 //User-defined functions
+
+int tpSafeIntInput(int *x) {
+	char buffer[15];
+	int i, size;
+	
+	scanf("%s", buffer);
+	size = strlen(buffer);
+	
+	if(size > 0) {
+		// Check for non-integer
+		for(i=0;i<size;i++) {
+			if((buffer[i] < '0' || buffer[i] > '9') && buffer[i] != '-')
+				return 0;
+		}
+		// Convert to integer
+		*x = atoi(buffer);
+		return 1;
+	}
+	
+	return 0;
+}
 // ==================== START OF RNG FUNCTIONS =======================
 /*
     1. Generates 9 different prices for each
@@ -240,20 +261,27 @@ void copySupplyDemand(int ogSupply[3], int ogDemand[3], int supply[3], int deman
 void startMenu(int *nOption){
 	int exit=0;
 	while(exit!=1){
-	printf("=======================================\n      TRANSPORTATION PROBLEM GAME\n=======================================\n");
-	printf("[Setting]:\n\n  During time of Covid-19 lockdown, online purchasing has been the highest it has ever been. However, this \nmeans that work in shopee management is more hectic than ever, the company needs more logistics managers! \nAs Shopee employees, you are both given the chance at a promotion but only one will get the position. So \nthe company decided to make this a competition between you two.\n\n  You are both given the task to manage distribution of toilet paper orders throughout Luzon, Visayas, and Mindanao.\nYou are given a choice to allocate the method of distribution through land, sea, and air with varying costs. Whoever\nis able to minimize the cost while distributing everyting will get the position. Who will prevail?\n\n");
-	printf("[1] Start Game\n");
-	printf("[2] Back to Main Menu\n\n");
-	printf("Enter option number: ");
-	scanf("%d", nOption);
-	
-	if(*nOption==2||*nOption==1)
-		exit=1;
-	else{
-		printf("\n[INVALID INPUT]\n");
-		OS_PAUSE();
-		OS_CLEAR();
-	}
+		printf("=======================================\n      TRANSPORTATION PROBLEM GAME\n=======================================\n");
+		printf("[Setting]:\n\n  During time of Covid-19 lockdown, online purchasing has been the highest it has ever been. However, this \nmeans that work in shopee management is more hectic than ever, the company needs more logistics managers! \nAs Shopee employees, you are both given the chance at a promotion but only one will get the position. So \nthe company decided to make this a competition between you two.\n\n  You are both given the task to manage distribution of toilet paper orders throughout Luzon, Visayas, and Mindanao.\nYou are given a choice to allocate the method of distribution through land, sea, and air with varying costs. Whoever\nis able to minimize the cost while distributing everyting will get the position. Who will prevail?\n\n");
+		printf("[1] Start Game\n");
+		printf("[2] Back to Main Menu\n\n");
+		printf("Enter option number: ");
+		if (tpSafeIntInput(nOption))
+		{
+			if(*nOption==2||*nOption==1)
+				exit=1;
+			else{
+				printf("\n[INVALID INPUT]\n");
+				OS_PAUSE();
+				OS_CLEAR();
+			}
+		}
+		else{
+			printf("\n[INVALID INPUT]\n");
+			OS_PAUSE();
+			OS_CLEAR();
+		}
+				
 	}
 }
 
@@ -305,14 +333,18 @@ int getPos(int pos){
 	int exit=0;
 	while(exit!=1){
 		printf("\n\nPick a position: ");
-		scanf("%d", &pos);
-		//getIndex(pos, &col, &row);
-	
-		if(pos<=0 || pos>9){
-			printf("\n[INVALID POSITION!]\n");
+		if (tpSafeIntInput(&pos))
+		{
+			if(pos<=0 || pos>9)
+				printf("\n[INVALID POSITION!]\n");
+			else
+				exit=1;
 		}
 		else
-			exit=1;
+			printf("\n[INVALID POSITION!]\n");
+		//getIndex(pos, &col, &row);
+	
+		
 	}
 	//systempause; <====put OSPAUSE here
 	return pos;
@@ -323,40 +355,49 @@ int getPos(int pos){
 	col = demand
 */
 void fillTable(int supply[3], int demand[3], Detail player[3][3], int pos){
-	int row, col, tempQuant, invalid, *storedQuant;
+	int row, col, tempQuant, invalid, *storedQuant, isChar;
 	pos -= 1;
 	getIndex(pos, &row, &col);
 	storedQuant = &player[row][col].quantity;
 	do{
 		invalid = 0;
-		do{
-			printf("Enter quantity to allocate: ");
-			scanf("%d", &tempQuant);
-			if (tempQuant < 0)
-				printf("Only non-negative integers allowed\n\n");
-		}while(tempQuant < 0);
 		
-		if (checkSupply(supply[row], *storedQuant, tempQuant)) 	//quant = less than or equal to supply
-		{
-			if (checkDemand(demand[col], *storedQuant, tempQuant)) //quant = less than or equal to demand
-			{
-				//store tempQuant to player[row][col].quantity; reduce supply, might have to make another supply variable
-				supply[row] += *storedQuant - tempQuant;
-				demand[col] += *storedQuant - tempQuant;
-				*storedQuant = tempQuant;
+		do{
+			isChar = 0; // if user inputs a character
+			printf("Enter quantity to allocate [ [-1] to cancel ]: ");
+			if(tpSafeIntInput(&tempQuant)){
+				if (tempQuant < 0)
+					printf("Only non-negative integers allowed\n\n");
 			}
 			else{
-				printf("Quantity exceeds demand of [%d], please allocate a lesser quantity...\n\n",  *storedQuant + demand[col]);
+				printf("Only non-negative integers allowed\n\n");
+				isChar = 1;
+			}
+		}while(tempQuant < -1 || isChar);
+	
+		if (tempQuant != -1)
+		{
+			if (checkSupply(supply[row], *storedQuant, tempQuant)) 	//quant = less than or equal to supply
+			{
+				if (checkDemand(demand[col], *storedQuant, tempQuant)) //quant = less than or equal to demand
+				{
+					//store tempQuant to player[row][col].quantity; reduce supply, might have to make another supply variable
+					supply[row] += *storedQuant - tempQuant;
+					demand[col] += *storedQuant - tempQuant;
+					*storedQuant = tempQuant;
+				}
+				else{
+					printf("Quantity exceeds demand of [%d], please allocate a lesser quantity...\n\n",  *storedQuant + demand[col]);
+					invalid = 1;
+					OS_PAUSE();
+				}
+			}
+			else{
+				printf("Quantity exceeds supply [%d]: please allocate a lesser quantity...\n\n", *storedQuant + supply[row]);
 				invalid = 1;
 				OS_PAUSE();
 			}
-		}
-		else{
-			printf("Quantity exceeds supply [%d]: please allocate a lesser quantity...\n\n", *storedQuant + supply[row]);
-			invalid = 1;
-			OS_PAUSE();
-		}
-			
+		}	
 	}while(invalid == 1);
 }
 
@@ -1031,7 +1072,7 @@ int transpoProblem(void) {
 				pos=getPos(pos); 
 				fillTable(supply, demand, player2, pos);
 				if (isComplete(supply, demand)){
-					displayTable(supply, demand, player1, labels, ogSupply, ogDemand);
+					displayTable(supply, demand, player2, labels, ogSupply, ogDemand);
 					printf("\nAll allocations completed... End your turn? [Y/N]: ");
 					scanf(" %c", &cOption);
 					if (cOption == 'Y' || cOption == 'y')
@@ -1039,11 +1080,9 @@ int transpoProblem(void) {
 					else if (cOption == 'N' || cOption == 'n'){
 						printf("\n\nEdit the quantities that you wish to change\n\n");
 						OS_PAUSE();
-						OS_CLEAR();
 					}
 				}
-				//check if all information is filled
-				//if all is filled, prompt user to confirm		
+				OS_CLEAR();	
 			}while(!over);
 			total2= calculateCost(player2);	//display this afterward
 			printf("=============================================\n");
