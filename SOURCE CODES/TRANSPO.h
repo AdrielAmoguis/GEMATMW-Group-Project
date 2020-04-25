@@ -146,51 +146,51 @@ void topTable(String28 labels[]){
 	int i;
 	
 	printf("%c", UL_COR);
+	for(i=0; i<17;i++){
+		printf("%c", HORI);
+	}
+	printf("%c", U_MID);
 	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", U_MID);
-	for(i=0; i<14;i++){
+	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", U_MID);
-	for(i=0; i<14;i++){
+	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", U_MID);
-	for(i=0; i<14;i++){
-		printf("%c", HORI);
-	}
-	printf("%c", U_MID);
-	for(i=0; i<7;i++){
+	for(i=0; i<8;i++){
 			printf("%c", HORI);
 		}
 	printf("%c", UR_COR);
 	printf("\n");
-	printf("%c%-15s%c%-14s%c%-14s%c%-14s%c%-7s%c\n", VERT, " ", VERT, labels[0], VERT, labels[1], VERT, labels[2], VERT, " ", VERT);
+	printf("%c%-17s%c %-14s%c %-14s%c %-14s%c %-7s%c\n", VERT, " ", VERT, labels[0], VERT, labels[1], VERT, labels[2], VERT, " ", VERT);
 }
 //prints only the lines in between the middle rows of the table
 void midTable(){
 	int i;
 	printf("%c", L_EDGE);
+	for(i=0; i<17;i++){
+		printf("%c", HORI);
+	}
+	printf("%c", MID);
 	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", MID);
-	for(i=0; i<14;i++){
+	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", MID);
-	for(i=0; i<14;i++){
-		printf("%c", HORI);
-	}
-	printf("%c", MID);
-	for(i=0; i<14;i++){
+	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", MID);
 	
-	for(i=0; i<7;i++){
+	for(i=0; i<8;i++){
 		printf("%c", HORI);
   }
 	printf("%c", R_EDGE);
@@ -199,26 +199,26 @@ void midTable(){
 //displays the bottom line of the table including the labels in the last wrow
 void botTable(int demand[],int ogDemand[]){
 	int i;
-	printf("%c%-15s%c%7d/%-6d%c%7d/%-6d%c%7d/%-6d%c%-7s%c\n", VERT, " ", VERT, demand[0], ogDemand[0], VERT, demand[1], ogDemand[1], VERT, demand[2], ogDemand[2], VERT, " ", VERT);
+	printf("%c%-17s%c %7d/%-6d%c %7d/%-6d%c %7d/%-6d%c %-7s%c\n", VERT, " ", VERT, demand[0], ogDemand[0], VERT, demand[1], ogDemand[1], VERT, demand[2], ogDemand[2], VERT, " ", VERT);
 	printf("%c", LL_COR);
+	for(i=0; i<17;i++){
+		printf("%c", HORI);
+	}
+	printf("%c", L_MID);
 	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", L_MID);
-	for(i=0; i<14;i++){
+	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", L_MID);
-	for(i=0; i<14;i++){
-		printf("%c", HORI);
-	}
-	printf("%c", L_MID);
-	for(i=0; i<14;i++){
+	for(i=0; i<15;i++){
 		printf("%c", HORI);
 	}
 	printf("%c", L_MID);
 
-	for(i=0; i<7;i++){
+	for(i=0; i<8;i++){
 		printf("%c", HORI);
 	}
 	printf("%c\n", LR_COR);
@@ -231,7 +231,7 @@ void displayTable(int supply[], int demand[], Detail details[][3], String28 labe
 	topTable(labels);
 	for(i=0;i<3;i++){
 		midTable();
-		printf("%c%-15s%c%c%d%c%4d|%6.2f%c%c%d%c%4d|%6.2f%c%c%d%c%4d|%6.2f%c%3d/%3d%c\n", VERT, labels[h], VERT, '[', 1+3*i,']', details[i][0].quantity , details[i][0].price, VERT, '[', 2+3*i,']', details[i][1].quantity, details[i][1].price, VERT, '[', 3+3*i,']', details[i][2].quantity, details[i][2].price, VERT, supply[i], ogSupply[i], VERT);
+		printf("%c%-17s%c %c%d%c%4d|%6.2f%c %c%d%c%4d|%6.2f%c %c%d%c%4d|%6.2f%c %3d/%3d%c\n", VERT, labels[h], VERT, '[', 1+3*i,']', details[i][0].quantity , details[i][0].price, VERT, '[', 2+3*i,']', details[i][1].quantity, details[i][1].price, VERT, '[', 3+3*i,']', details[i][2].quantity, details[i][2].price, VERT, supply[i], ogSupply[i], VERT);
 		h++;
 	}
 	midTable();
@@ -239,6 +239,7 @@ void displayTable(int supply[], int demand[], Detail details[][3], String28 labe
 }
 
 // ========================== END OF DISPLAY FUNCTIONS ===============================
+
 void initializePlayers(Detail details[3][3], Detail player1[3][3], Detail player2[3][3], Detail best[3][3]){
 	int row, col;
 	for (row=0; row<3; row++){
